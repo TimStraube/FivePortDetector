@@ -56,7 +56,7 @@ extern "C" {
 volatile uint32_t adc_raw[3];
 volatile bool new_sample_ready = false;
 volatile int sym_idx = 0;
-volatile int8_t I_sent = 0, Q_sent = 0;
+volatile uint8_t I_sent = 0, Q_sent = 0;
 
 static float rg[3], ig[3], dc[3];
 static bool calibrated = false;
@@ -64,12 +64,12 @@ static bool calibrated = false;
 // ───────── Training ─────────
 #define N_CAL 16
 
-const int8_t I_TRAIN[N_CAL] = {
-  1, 1,-1,-1,  1, 1,-1,-1,  1, 1,-1,-1,  1, 1,-1,-1
+const uint8_t I_TRAIN[N_CAL] = {
+  1, 1, 0, 0,  1, 1, 0, 0,  1, 1, 0, 0,  1, 1, 0, 0
 };
 
-const int8_t Q_TRAIN[N_CAL] = {
-  1,-1, 1,-1,  1,-1, 1,-1,  1,-1, 1,-1,  1,-1, 1,-1
+const uint8_t Q_TRAIN[N_CAL] = {
+  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0
 };
 
 // ───────── Timer ISR ─────────
@@ -80,8 +80,8 @@ void Timer0IntHandler(void)
     I_sent = I_TRAIN[sym_idx];
     Q_sent = Q_TRAIN[sym_idx];
 
-    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, (I_sent > 0) ? GPIO_PIN_4 : 0);
-    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, (Q_sent > 0) ? GPIO_PIN_5 : 0);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, I_sent ? GPIO_PIN_4 : 0);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, Q_sent ? GPIO_PIN_5 : 0);
 
     sym_idx = (sym_idx + 1) % N_CAL;
 
@@ -172,23 +172,24 @@ static void calibrate()
 
         read_detectors(V[n]);
 
-        Ivec[n] = I_sent;
-        Qvec[n] = Q_sent;
+        // Zentrieren: 0→-0.5, 1→+0.5  (macht mean=0, lstsq korrekt)
+        Ivec[n] = (float)I_sent - 0.5f;
+        Qvec[n] = (float)Q_sent - 0.5f;
     }
 
-    // DC
+    // dc = Mittelwert der Detektoren
     for(int k=0;k<3;k++){
         dc[k]=0;
-        for(int n=0;n<N_CAL;n++)
-            dc[k]+=V[n][k];
+        for(int n=0;n<N_CAL;n++) dc[k]+=V[n][k];
         dc[k]/=N_CAL;
     }
 
-    // Matrix
+    // Residuen (DC-frei)
     for(int n=0;n<N_CAL;n++)
         for(int k=0;k<3;k++)
             A[n][k]=V[n][k]-dc[k];
 
+    // Inverses Modell: finde rg,ig s.d. Σ rg[k]*ṽ[k] ≈ I-0.5
     lstsq3(A,Ivec,N_CAL,rg);
     lstsq3(A,Qvec,N_CAL,ig);
 
@@ -202,7 +203,8 @@ static void calibrate()
 // ───────── Demod ─────────
 static void demodulate(const float v[3], float* I, float* Q)
 {
-    *I=*Q=0;
+    *I = 0.5f;
+    *Q = 0.5f;
     for(int k=0;k<3;k++){
         float vt=v[k]-dc[k];
         *I+=rg[k]*vt;
