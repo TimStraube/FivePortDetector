@@ -27,338 +27,259 @@
 #include <Arduino.h>
 #include <math.h>
 #include <stdio.h>
-#include "constants.h"
 
-// ── Portables Serial.printf-Ersatz (Energia hat kein Serial.printf) ───────────
-#ifdef BOARD_TM4C129EXL
-static char _sp_buf[200];
-#  define serial_printf(fmt, ...) \
-       do { snprintf(_sp_buf, sizeof(_sp_buf), fmt, ##__VA_ARGS__); \
-            Serial.print(_sp_buf); } while(0)
-#else
-#  define serial_printf(fmt, ...) Serial.printf(fmt, ##__VA_ARGS__)
-#endif
+// ───────── TM4C Low-Level ─────────
+extern "C" {
+  #include "inc/hw_memmap.h"
+  #include "driverlib/sysctl.h"
+  #include "driverlib/adc.h"
+  #include "driverlib/gpio.h"
+  #include "driverlib/timer.h"
+  #include "driverlib/interrupt.h"
+}
 
-// ── Pin-Definitionen ──────────────────────────────────────────────────────────
-#ifdef BOARD_TM4C129EXL
-// EK-TM4C129EXL – BoosterPack 1 (Energia-Pinnummern)
-#  define IQ_I_PIN     PC_4  // I-Bit → X8_05
-#  define IQ_Q_PIN     PC_5  // Q-Bit → X8_07
-#  define ADC_V1_PIN   A0    // PE3  – J1 Pin 2
-#  define ADC_V2_PIN   A1    // PE2  – J1 Pin 6
-#  define ADC_V3_PIN   A2    // PE1  – J1 Pin 5
-#  define VREF_BOARD   3.3f
-#  define TRIGGER_PIN  PUSH1  // SW1 auf dem LaunchPad (PJ0, active-low)
-#else
-// STM32F411RE Nucleo-64
-#  define IQ_I_PIN     PA6
-#  define IQ_Q_PIN     PA7
-#  define ADC_V1_PIN   PA0
-#  define ADC_V2_PIN   PA1
-#  define ADC_V3_PIN   PB0
-#  define VREF_BOARD   3.3f
-#  define TRIGGER_PIN  PC13  // Nucleo User-Button (active-low)
-#endif
+// ───────── Settings ─────────
+#define VREF 3.3f
+#define ADC_MAXVAL 4095.0f
 
-static constexpr int N_RESULT = 20;  // Messungen nach Kalibrierung
+#define SERIAL_SHOW_ADC 1
+#define SERIAL_SHOW_IQ  1
 
-// ── Kalibrierungsparameter ────────────────────────────────────────────────────
-static constexpr int   N_CAL      = 10;    // Anzahl Trainingssymbole
-static constexpr int   N_AVG      = 1;     // ADC-Mittelwertbildung pro Messung
-static constexpr int   T_SETTLE   = 1;     // Einschwingzeit [ms] nach Symbolwechsel (1kHz)
-static constexpr float VREF       = VREF_BOARD;
-static constexpr float ADC_MAXVAL = 4095.0f;
+#define FS 1000   // 1 kHz
 
-// ── QPSK-Trainingssequenz (bekannt, ±1) ──────────────────────────────────────
-// Je 16 Wiederholungen aller 4 Quadranten → gute Überbestimmung
-static const int8_t I_TRAIN[N_CAL] = {
-     1, -1,-1, 1, 1, 1,-1,-1, 1, 1,
-};
-static const int8_t Q_TRAIN[N_CAL] = {
-     1, -1, 1, 1,-1,-1,-1,-1, 1, 1,
-};
+// ───────── Pins ─────────
+#define IQ_I_PIN PC_4
+#define IQ_Q_PIN PC_5
 
-// ── Kalibrierungsergebnis ─────────────────────────────────────────────────────
-// I(t) = rg[0]·ṽ_o1 + rg[1]·ṽ_o2 + rg[2]·ṽ_o3  (Gl. 19)
-// Q(t) = ig[0]·ṽ_o1 + ig[1]·ṽ_o2 + ig[2]·ṽ_o3  (Gl. 20)
+// ───────── Globals ─────────
+volatile uint32_t adc_raw[3];
+volatile bool new_sample_ready = false;
+volatile int sym_idx = 0;
+
 static float rg[3], ig[3], dc[3];
-static bool  calibrated = false;
+static bool calibrated = false;
 
+// ───────── Training ─────────
+#define N_CAL 16
 
-// ─────────────────────────────────────────────────────────────────────────────
-// IQ-Generator Interface
-// I-Bit → PC4 (IQ_I_PIN), Q-Bit → PC5 (IQ_Q_PIN)
-// HIGH = +1, LOW = −1
-// ─────────────────────────────────────────────────────────────────────────────
-static void iqgen_send(int8_t I, int8_t Q)
+const int8_t I_TRAIN[N_CAL] = {
+  1,1,-1,-1, 1,1,-1,-1, 1,1,-1,-1, 1,1,-1,-1
+};
+
+const int8_t Q_TRAIN[N_CAL] = {
+  1,-1,1,-1, 1,-1,1,-1, 1,-1,1,-1, 1,-1,1,-1
+};
+
+// ───────── Timer ISR ─────────
+void Timer0IntHandler(void)
 {
-    if (I < 0 && Q < 0) Q = 1;  // mindestens eines immer HIGH
-    digitalWrite(IQ_I_PIN, I > 0 ? HIGH : LOW);
-    digitalWrite(IQ_Q_PIN, Q > 0 ? HIGH : LOW);
-    delay(T_SETTLE);
-}
+    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-static void iqgen_send_actual(int8_t &I, int8_t &Q)
-{
+    int8_t I = I_TRAIN[sym_idx];
+    int8_t Q = Q_TRAIN[sym_idx];
+
     if (I < 0 && Q < 0) Q = 1;
-    iqgen_send(I, Q);
+
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, (I > 0) ? GPIO_PIN_4 : 0);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, (Q > 0) ? GPIO_PIN_5 : 0);
+
+    sym_idx = (sym_idx + 1) % N_CAL;
+
+    ADCProcessorTrigger(ADC0_BASE, 0);
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ADC-Hilfsfunktionen
-// ─────────────────────────────────────────────────────────────────────────────
-static float adc_voltage(uint32_t pin)
+// ───────── ADC ISR ─────────
+void ADC0SS0IntHandler(void)
 {
-    uint32_t sum = 0;
-    for (int i = 0; i < N_AVG; i++) sum += analogRead(pin);
-    return (sum * VREF) / (ADC_MAXVAL * N_AVG);
+    ADCIntClear(ADC0_BASE, 0);
+
+    // ✅ FIX: cast wegen volatile
+    ADCSequenceDataGet(ADC0_BASE, 0, (uint32_t*)adc_raw);
+
+    new_sample_ready = true;
 }
 
+// ───────── ADC Read ─────────
 static void read_detectors(float v[3])
 {
-    v[0] = adc_voltage(ADC_V1_PIN);
-    v[1] = adc_voltage(ADC_V2_PIN);
-    v[2] = adc_voltage(ADC_V3_PIN);
+    v[0] = adc_raw[0] * VREF / ADC_MAXVAL;
+    v[1] = adc_raw[1] * VREF / ADC_MAXVAL;
+    v[2] = adc_raw[2] * VREF / ADC_MAXVAL;
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 3×3 Matrixinversion (Cramer-Regel)
-// ─────────────────────────────────────────────────────────────────────────────
+// ───────── Matrix Inversion ─────────
 static bool mat3_inv(const float M[3][3], float R[3][3])
 {
     float det =
-        M[0][0] * (M[1][1]*M[2][2] - M[1][2]*M[2][1]) -
-        M[0][1] * (M[1][0]*M[2][2] - M[1][2]*M[2][0]) +
-        M[0][2] * (M[1][0]*M[2][1] - M[1][1]*M[2][0]);
-    if (fabsf(det) < 1e-10f) return false;
+        M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])
+      - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])
+      + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
 
-    const float d = 1.0f / det;
-    R[0][0] =  (M[1][1]*M[2][2] - M[1][2]*M[2][1]) * d;
-    R[0][1] = -(M[0][1]*M[2][2] - M[0][2]*M[2][1]) * d;
-    R[0][2] =  (M[0][1]*M[1][2] - M[0][2]*M[1][1]) * d;
-    R[1][0] = -(M[1][0]*M[2][2] - M[1][2]*M[2][0]) * d;
-    R[1][1] =  (M[0][0]*M[2][2] - M[0][2]*M[2][0]) * d;
-    R[1][2] = -(M[0][0]*M[1][2] - M[0][2]*M[1][0]) * d;
-    R[2][0] =  (M[1][0]*M[2][1] - M[1][1]*M[2][0]) * d;
-    R[2][1] = -(M[0][0]*M[2][1] - M[0][1]*M[2][0]) * d;
-    R[2][2] =  (M[0][0]*M[1][1] - M[0][1]*M[1][0]) * d;
+    if (fabsf(det) < 1e-6f) return false;
+
+    float d = 1.0f/d;
+
+    R[0][0]=(M[1][1]*M[2][2]-M[1][2]*M[2][1])*d;
+    R[0][1]=-(M[0][1]*M[2][2]-M[0][2]*M[2][1])*d;
+    R[0][2]=(M[0][1]*M[1][2]-M[0][2]*M[1][1])*d;
+    R[1][0]=-(M[1][0]*M[2][2]-M[1][2]*M[2][0])*d;
+    R[1][1]=(M[0][0]*M[2][2]-M[0][2]*M[2][0])*d;
+    R[1][2]=-(M[0][0]*M[1][2]-M[0][2]*M[1][0])*d;
+    R[2][0]=(M[1][0]*M[2][1]-M[1][1]*M[2][0])*d;
+    R[2][1]=-(M[0][0]*M[2][1]-M[0][1]*M[2][0])*d;
+    R[2][2]=(M[0][0]*M[1][1]-M[0][1]*M[1][0])*d;
+
     return true;
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Kleinste-Quadrate-Lösung:  coeffs = (Aᵀ·A)⁻¹ · Aᵀ · b
-// A: [N×3],  b: [N],  coeffs: [3]  (Gl. 23/24)
-// ─────────────────────────────────────────────────────────────────────────────
-static bool lstsq3(const float A[][3], const float b[], int N, float coeffs[3])
+// ───────── Least Squares ─────────
+static bool lstsq3(const float A[][3], const float b[], int N, float c[3])
 {
-    float ATA[3][3] = {};
-    float ATb[3]    = {};
-    for (int n = 0; n < N; n++) {
-        for (int i = 0; i < 3; i++) {
-            ATb[i] += A[n][i] * b[n];
-            for (int j = 0; j < 3; j++)
-                ATA[i][j] += A[n][i] * A[n][j];
+    float ATA[3][3]={};
+    float ATb[3]={};
+
+    for(int n=0;n<N;n++){
+        for(int i=0;i<3;i++){
+            ATb[i]+=A[n][i]*b[n];
+            for(int j=0;j<3;j++)
+                ATA[i][j]+=A[n][i]*A[n][j];
         }
     }
-    float ATA_inv[3][3];
-    if (!mat3_inv(ATA, ATA_inv)) return false;
-    for (int i = 0; i < 3; i++) {
-        coeffs[i] = 0;
-        for (int j = 0; j < 3; j++)
-            coeffs[i] += ATA_inv[i][j] * ATb[j];
+
+    float inv[3][3];
+    if(!mat3_inv(ATA,inv)) return false;
+
+    for(int i=0;i<3;i++){
+        c[i]=0;
+        for(int j=0;j<3;j++)
+            c[i]+=inv[i][j]*ATb[j];
     }
     return true;
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Kalibrierungsroutine
-// ─────────────────────────────────────────────────────────────────────────────
-static bool calibrate()
+// ───────── Calibration ─────────
+static void calibrate()
 {
-    Serial.println("[CAL] Starte Kalibrierung...");
-
-    // Statisch um Stack-Overflow zu vermeiden (~2 KB)
     static float V[N_CAL][3];
     static float A[N_CAL][3];
     static float Ivec[N_CAL], Qvec[N_CAL];
-    static int8_t I_sent[N_CAL], Q_sent[N_CAL];
 
-    // Schritt 1: Trainingssymbole senden (mit Constraint) und ADCs lesen
-    for (int n = 0; n < N_CAL; n++) {
-        I_sent[n] = I_TRAIN[n];
-        Q_sent[n] = Q_TRAIN[n];
-        iqgen_send_actual(I_sent[n], Q_sent[n]);
+    Serial.println("Calibrating...");
+
+    for(int n=0;n<N_CAL;n++){
+        while(!new_sample_ready);
+        new_sample_ready=false;
+
         read_detectors(V[n]);
+
+        Ivec[n]=I_TRAIN[n];
+        Qvec[n]=Q_TRAIN[n];
     }
 
-    // Schritt 2: DC-Offset bestimmen und entfernen (Gl. 15)
-    dc[0] = dc[1] = dc[2] = 0.0f;
-    for (int n = 0; n < N_CAL; n++)
-        for (int k = 0; k < 3; k++)
-            dc[k] += V[n][k];
-    for (int k = 0; k < 3; k++) dc[k] /= N_CAL;
-    if (SERIAL_SHOW_CALIBRATION_RESULTS)
-        serial_printf("[CAL] DC-Offset: [%.3f %.3f %.3f] V\n", dc[0], dc[1], dc[2]);
-
-    // Matrix A aus DC-bereinigten Spannungen aufbauen
-    for (int n = 0; n < N_CAL; n++) {
-        for (int k = 0; k < 3; k++)
-            A[n][k] = V[n][k] - dc[k];
-        Ivec[n] = (float)I_sent[n];
-        Qvec[n] = (float)Q_sent[n];
+    // DC
+    for(int k=0;k<3;k++){
+        dc[k]=0;
+        for(int n=0;n<N_CAL;n++)
+            dc[k]+=V[n][k];
+        dc[k]/=N_CAL;
     }
 
-    // Schritt 3: Kleinste Quadrate → rg[], ig[]  (Gl. 23/24)
-    if (!lstsq3(A, Ivec, N_CAL, rg)) {
-        Serial.println("[CAL] FEHLER: Singulaere Matrix (I-Kanal)");
-        return false;
-    }
-    if (!lstsq3(A, Qvec, N_CAL, ig)) {
-        Serial.println("[CAL] FEHLER: Singulaere Matrix (Q-Kanal)");
-        return false;
-    }
+    // Matrix
+    for(int n=0;n<N_CAL;n++)
+        for(int k=0;k<3;k++)
+            A[n][k]=V[n][k]-dc[k];
 
-    if (SERIAL_SHOW_CALIBRATION_RESULTS) {
-        serial_printf("[CAL] rg = [%+.4f, %+.4f, %+.4f]\n", rg[0], rg[1], rg[2]);
-        serial_printf("[CAL] ig = [%+.4f, %+.4f, %+.4f]\n", ig[0], ig[1], ig[2]);
-        Serial.println("[CAL] Kalibrierung erfolgreich.");
-    }
-    return true;
+    lstsq3(A,Ivec,N_CAL,rg);
+    lstsq3(A,Qvec,N_CAL,ig);
+
+    calibrated=true;
+    Serial.println("Calibration done");
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// I/Q-Demodulation (Gl. 19 / 20)
-// ─────────────────────────────────────────────────────────────────────────────
-static void demodulate(const float v[3], float *I_out, float *Q_out)
+// ───────── Demod ─────────
+static void demodulate(const float v[3], float* I, float* Q)
 {
-    *I_out = *Q_out = 0.0f;
-    for (int k = 0; k < 3; k++) {
-        const float vtilde = v[k] - dc[k];
-        *I_out += rg[k] * vtilde;
-        *Q_out += ig[k] * vtilde;
+    *I=*Q=0;
+    for(int k=0;k<3;k++){
+        float vt=v[k]-dc[k];
+        *I+=rg[k]*vt;
+        *Q+=ig[k]*vt;
     }
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
+// ───────── Setup ─────────
 void setup()
 {
-    Serial.begin(921600);
+    Serial.begin(115200);
+
+    uint32_t freq = SysCtlClockFreqSet(
+        SYSCTL_XTAL_25MHZ |
+        SYSCTL_OSC_MAIN |
+        SYSCTL_USE_PLL |
+        SYSCTL_CFG_VCO_480,
+        120000000);
+
+    // GPIO
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC));
+    GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+
+    // ADC
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
+
+    ADCSequenceConfigure(ADC0_BASE,0,ADC_TRIGGER_PROCESSOR,0);
+    ADCSequenceStepConfigure(ADC0_BASE,0,0,ADC_CTL_CH0);
+    ADCSequenceStepConfigure(ADC0_BASE,0,1,ADC_CTL_CH1);
+    ADCSequenceStepConfigure(ADC0_BASE,0,2,ADC_CTL_CH2 | ADC_CTL_IE | ADC_CTL_END);
+
+    ADCSequenceEnable(ADC0_BASE,0);
+    ADCIntClear(ADC0_BASE,0);
+
+    // Timer
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_TIMER0));
+
+    TimerConfigure(TIMER0_BASE,TIMER_CFG_PERIODIC);
+    TimerLoadSet(TIMER0_BASE,TIMER_A,(freq/FS)-1);
+
+    
+    IntEnable(INT_TIMER0A_TM4C129);
+    IntEnable(INT_ADC0SS0_TM4C129);
+    TimerIntEnable(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
+
+
+    IntMasterEnable();
+
+    TimerEnable(TIMER0_BASE,TIMER_A);
+
     delay(500);
-#ifdef BOARD_TM4C129EXL
-    Serial.println("=== Five-Port Detektor EK-TM4C129EXL ===");
-#else
-    Serial.println("=== Five-Port Detektor STM32F411RE ===");
-#endif
-    analogReadResolution(12);
 
-    pinMode(TRIGGER_PIN, INPUT_PULLUP);
-    pinMode(IQ_I_PIN, OUTPUT);
-    pinMode(IQ_Q_PIN, OUTPUT);
-    digitalWrite(IQ_I_PIN, LOW);
-    digitalWrite(IQ_Q_PIN, LOW);
-
-
-#if CALIBRATION_MODE
-    Serial.println("Druecke SW1 oder sende 's' per Serial.");
-#endif
+    calibrate();
 }
 
+// ───────── Loop ─────────
 void loop()
 {
-#if CALIBRATION_MODE
-    {
-        bool btn = (digitalRead(TRIGGER_PIN) == LOW);
-        bool ser = (Serial.available() && Serial.read() == 's');
-        if (!btn && !ser) return;
-        if (btn) { delay(50); if (digitalRead(TRIGGER_PIN) != LOW) return; }
-    }
-    while (digitalRead(TRIGGER_PIN) == LOW) {}  // warte auf Loslassen
-    delay(50);
-    Serial.println("[START] Starte...");
+    if(!new_sample_ready) return;
 
-    if (ENABLE_ADCS) {
-        calibrated = calibrate();
-        if (!calibrated) {
-            Serial.println("[ERR] Kalibrierung fehlgeschlagen.");
-            while (digitalRead(TRIGGER_PIN) == LOW) {}
-            return;
-        }
-    }
+    new_sample_ready=false;
 
-    Serial.println("--- Start (SW1=Stop) ---");
-    bool running = true;
-    uint32_t t_print = 0;
-    while (running) {
-        // Komplette Sequenz mit 1kHz senden
-        uint32_t t_sym = millis();
-        for (int sym = 0; sym < N_CAL && running; sym++) {
-            while (millis() < t_sym) {}   // 1kHz-Takt
-            t_sym++;
-
-            int8_t I_s = I_TRAIN[sym], Q_s = Q_TRAIN[sym];
-            iqgen_send_actual(I_s, Q_s);
-
-            if (ENABLE_ADCS) {
-                float v[3];
-                read_detectors(v);
-                float I_dem, Q_dem;
-                demodulate(v, &I_dem, &Q_dem);
-                uint32_t now = millis();
-                if (SERIAL_SHOW_IQ && now >= t_print) {
-                    serial_printf("%+.4f,%+.4f\n", I_dem, Q_dem);
-                    t_print = now + 500;
-                }
-                if (SERIAL_SHOW_ADC && now >= t_print) {
-                    serial_printf("%.4f,%.4f,%.4f\n", v[0], v[1], v[2]);
-                    t_print = now + 500;
-                }
-            }
-
-            if (digitalRead(TRIGGER_PIN) == LOW) {
-                delay(50);
-                if (digitalRead(TRIGGER_PIN) == LOW) {
-                    Serial.println("--- Stop ---");
-                    while (digitalRead(TRIGGER_PIN) == LOW) {}
-                    running = false;
-                }
-            }
-        }
-
-        if (!running) break;
-
-        // Pause: beide LOW für 100ms (non-blocking)
-        digitalWrite(IQ_I_PIN, LOW);
-        digitalWrite(IQ_Q_PIN, LOW);
-        uint32_t t_pause = millis();
-        while (millis() - t_pause < 100) {
-            if (digitalRead(TRIGGER_PIN) == LOW) {
-                delay(50);
-                if (digitalRead(TRIGGER_PIN) == LOW) {
-                    Serial.println("--- Stop ---");
-                    while (digitalRead(TRIGGER_PIN) == LOW) {}
-                    running = false;
-                    break;
-                }
-            }
-        }
-    }
-
-#else
     float v[3];
     read_detectors(v);
 
-    static uint32_t t_send = 0;
-    uint32_t now = millis();
-    if (now >= t_send) {
-        if (SERIAL_SHOW_ADC)
-            serial_printf("%.4f,%.4f,%.4f\n", v[0], v[1], v[2]);
-        t_send = now + 500;
+    if(SERIAL_SHOW_ADC){
+        Serial.print(v[0]); Serial.print(",");
+        Serial.print(v[1]); Serial.print(",");
+        Serial.println(v[2]);
     }
-#endif
+
+    if(calibrated && SERIAL_SHOW_IQ){
+        float I,Q;
+        demodulate(v,&I,&Q);
+
+        Serial.print(I);
+        Serial.print(",");
+        Serial.println(Q);
+    }
 }
