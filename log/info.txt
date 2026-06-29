@@ -1,0 +1,20 @@
+
+Ja, mathematisch funktioniert es. Die Gleichung v[k] = dc[k] + rg[k]·I + ig[k]·Q gilt für beliebige I/Q-Werte.
+
+Der Unterschied in der Konditionierung:
+
+Mit 0/1 (alle 4 Symbole gleich oft):
+A^T·A = [16  8   8 ]
+        [ 8  8   4 ]
+        [ 8  4   8 ]     det = 256
+
+Mit −1/+1:
+A^T·A = 16 · I₃           det = 4096
+
+Mit 0/1 sind die Spalten korreliert (weil der Mittelwert von I=0.5≠0), die Matrix ist schlechter konditioniert. Die Lösung ist aber eindeutig.
+
+Ein praktischer Vorteil von 0/1: Das Symbol (0,0) sendet gar kein Signal — die Detektoren messen reinen Hardware-Offset. Das macht dc[] direkt messbar ohne Kreuzterme.
+
+Ein Nachteil: Die Leistung ist ungleich verteilt — (1,1) sendet doppelt so viel wie (1,0) oder (0,1), und (0,0) gar nichts. Das erschwert die Trennung von I und Q etwas.
+
+Fazit: Für dein System (GPIO HIGH/LOW → 3.3V/0V) ist es grundsätzlich egal — du könntest {0,1} nehmen. −1/+1 hat aber bessere Konditionierung und gleichmäßige Signalleistung, deshalb ist es der Standard bei QPSK-Kalibration.

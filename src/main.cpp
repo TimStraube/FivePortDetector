@@ -65,11 +65,11 @@ static bool calibrated = false;
 #define N_CAL 16
 
 const int8_t I_TRAIN[N_CAL] = {
-  1,1,-1,-1, 1,1,-1,-1, 1,1,-1,-1, 1,1,-1,-1
+  1, 1,-1,-1,  1, 1,-1,-1,  1, 1,-1,-1,  1, 1,-1,-1
 };
 
 const int8_t Q_TRAIN[N_CAL] = {
-  1,-1,1,-1, 1,-1,1,-1, 1,-1,1,-1, 1,-1,-1,-1
+  1,-1, 1,-1,  1,-1, 1,-1,  1,-1, 1,-1,  1,-1, 1,-1
 };
 
 // ───────── Timer ISR ─────────
@@ -79,8 +79,6 @@ void Timer0IntHandler(void)
 
     I_sent = I_TRAIN[sym_idx];
     Q_sent = Q_TRAIN[sym_idx];
-
-    if (I_sent < 0 && Q_sent < 0) Q_sent = 1;
 
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, (I_sent > 0) ? GPIO_PIN_4 : 0);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, (Q_sent > 0) ? GPIO_PIN_5 : 0);
@@ -117,7 +115,7 @@ static bool mat3_inv(const float M[3][3], float R[3][3])
       - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])
       + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
 
-    if (fabsf(det) < 1e-6f) return false;
+    if (fabsf(det) < 1e-30f) return false;
 
     float d = 1.0f/det;
 
@@ -196,6 +194,9 @@ static void calibrate()
 
     calibrated=true;
     Serial.println("Calibration done");
+    Serial.print("dc:  "); Serial.print(dc[0],4); Serial.print("  "); Serial.print(dc[1],4); Serial.print("  "); Serial.println(dc[2],4);
+    Serial.print("rg:  "); Serial.print(rg[0],4); Serial.print("  "); Serial.print(rg[1],4); Serial.print("  "); Serial.println(rg[2],4);
+    Serial.print("ig:  "); Serial.print(ig[0],4); Serial.print("  "); Serial.print(ig[1],4); Serial.print("  "); Serial.println(ig[2],4);
 }
 
 // ───────── Demod ─────────
@@ -274,6 +275,7 @@ void loop()
 {
     sym_idx = 0;
     TimerEnable(TIMER0_BASE, TIMER_A);
+    calibrate();
 
     Serial.println("--- burst ---");
     float I_avg = 0, Q_avg = 0;
