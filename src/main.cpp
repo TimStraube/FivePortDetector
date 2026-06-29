@@ -31,6 +31,7 @@
 // ───────── TM4C Low-Level ─────────
 extern "C" {
   #include "inc/hw_memmap.h"
+  #include "inc/hw_ints.h"
   #include "driverlib/sysctl.h"
   #include "driverlib/adc.h"
   #include "driverlib/gpio.h"
@@ -55,6 +56,7 @@ extern "C" {
 volatile uint32_t adc_raw[3];
 volatile bool new_sample_ready = false;
 volatile int sym_idx = 0;
+volatile int8_t I_sent = 0, Q_sent = 0;
 
 static float rg[3], ig[3], dc[3];
 static bool calibrated = false;
@@ -67,7 +69,7 @@ const int8_t I_TRAIN[N_CAL] = {
 };
 
 const int8_t Q_TRAIN[N_CAL] = {
-  1,-1,1,-1, 1,-1,1,-1, 1,-1,1,-1, 1,-1,1,-1
+  1,-1,1,-1, 1,-1,1,-1, 1,-1,1,-1, 1,-1,-1,-1
 };
 
 // ───────── Timer ISR ─────────
@@ -75,13 +77,13 @@ void Timer0IntHandler(void)
 {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-    int8_t I = I_TRAIN[sym_idx];
-    int8_t Q = Q_TRAIN[sym_idx];
+    I_sent = I_TRAIN[sym_idx];
+    Q_sent = Q_TRAIN[sym_idx];
 
-    if (I < 0 && Q < 0) Q = 1;
+    if (I_sent < 0 && Q_sent < 0) Q_sent = 1;
 
-    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, (I > 0) ? GPIO_PIN_4 : 0);
-    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, (Q > 0) ? GPIO_PIN_5 : 0);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, (I_sent > 0) ? GPIO_PIN_4 : 0);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, (Q_sent > 0) ? GPIO_PIN_5 : 0);
 
     sym_idx = (sym_idx + 1) % N_CAL;
 
@@ -93,7 +95,7 @@ void ADC0SS0IntHandler(void)
 {
     ADCIntClear(ADC0_BASE, 0);
 
-    // ✅ FIX: cast wegen volatile
+    // cast wegen volatile
     ADCSequenceDataGet(ADC0_BASE, 0, (uint32_t*)adc_raw);
 
     new_sample_ready = true;
@@ -117,7 +119,7 @@ static bool mat3_inv(const float M[3][3], float R[3][3])
 
     if (fabsf(det) < 1e-6f) return false;
 
-    float d = 1.0f/d;
+    float d = 1.0f/det;
 
     R[0][0]=(M[1][1]*M[2][2]-M[1][2]*M[2][1])*d;
     R[0][1]=-(M[0][1]*M[2][2]-M[0][2]*M[2][1])*d;
@@ -172,8 +174,8 @@ static void calibrate()
 
         read_detectors(V[n]);
 
-        Ivec[n]=I_TRAIN[n];
-        Qvec[n]=Q_TRAIN[n];
+        Ivec[n] = I_sent;
+        Qvec[n] = Q_sent;
     }
 
     // DC
@@ -210,8 +212,6 @@ static void demodulate(const float v[3], float* I, float* Q)
 // ───────── Setup ─────────
 void setup()
 {
-    Serial.begin(115200);
-
     uint32_t freq = SysCtlClockFreqSet(
         SYSCTL_XTAL_25MHZ |
         SYSCTL_OSC_MAIN |
@@ -219,10 +219,17 @@ void setup()
         SYSCTL_CFG_VCO_480,
         120000000);
 
+    Serial.begin(921600);
+
     // GPIO
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC));
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
+
+    // ADC Pins PE1/PE2/PE3 als Analogeingang
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
+    GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
 
     // ADC
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
@@ -233,7 +240,9 @@ void setup()
     ADCSequenceStepConfigure(ADC0_BASE,0,1,ADC_CTL_CH1);
     ADCSequenceStepConfigure(ADC0_BASE,0,2,ADC_CTL_CH2 | ADC_CTL_IE | ADC_CTL_END);
 
+    ADCHardwareOversampleConfigure(ADC0_BASE, 64);
     ADCSequenceEnable(ADC0_BASE,0);
+    ADCIntEnable(ADC0_BASE,0);
     ADCIntClear(ADC0_BASE,0);
 
     // Timer
@@ -244,8 +253,10 @@ void setup()
     TimerLoadSet(TIMER0_BASE,TIMER_A,(freq/FS)-1);
 
     
-    IntEnable(INT_TIMER0A_TM4C129);
-    IntEnable(INT_ADC0SS0_TM4C129);
+    TimerIntRegister(TIMER0_BASE, TIMER_A, Timer0IntHandler);
+    ADCIntRegister(ADC0_BASE, 0, ADC0SS0IntHandler);
+    IntEnable(INT_TIMER0A);
+    IntEnable(INT_ADC0SS0);
     TimerIntEnable(TIMER0_BASE,TIMER_TIMA_TIMEOUT);
 
 
@@ -261,25 +272,43 @@ void setup()
 // ───────── Loop ─────────
 void loop()
 {
-    if(!new_sample_ready) return;
+    sym_idx = 0;
+    TimerEnable(TIMER0_BASE, TIMER_A);
 
-    new_sample_ready=false;
+    Serial.println("--- burst ---");
+    float I_avg = 0, Q_avg = 0;
+    for(int n = 0; n < N_CAL; n++){
+        while(!new_sample_ready);
+        new_sample_ready = false;
 
-    float v[3];
-    read_detectors(v);
+        float v[3];
+        read_detectors(v);
+        float I, Q;
+        demodulate(v, &I, &Q);
+        I_avg += I;
+        Q_avg += Q;
 
-    if(SERIAL_SHOW_ADC){
-        Serial.print(v[0]); Serial.print(",");
-        Serial.print(v[1]); Serial.print(",");
-        Serial.println(v[2]);
+        if(SERIAL_SHOW_ADC){
+            Serial.print("n="); Serial.print(n);
+            Serial.print(" I_sym="); Serial.print(I_sent);
+            Serial.print(" Q_sym="); Serial.print(Q_sent);
+            Serial.print(" | ADC: ");
+            Serial.print(v[0],4); Serial.print("V  ");
+            Serial.print(v[1],4); Serial.print("V  ");
+            Serial.print(v[2],4); Serial.print("V");
+            Serial.print(" | IQ: ");
+            Serial.print(I,4); Serial.print("  ");
+            Serial.println(Q,4);
+        }
     }
 
-    if(calibrated && SERIAL_SHOW_IQ){
-        float I,Q;
-        demodulate(v,&I,&Q);
+    TimerDisable(TIMER0_BASE, TIMER_A);
+    GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5, 0);
 
-        Serial.print(I);
-        Serial.print(",");
-        Serial.println(Q);
+    if(SERIAL_SHOW_IQ){
+        Serial.print("AVG I="); Serial.print(I_avg / N_CAL, 4);
+        Serial.print("  Q="); Serial.println(Q_avg / N_CAL, 4);
     }
+
+    delay(1000);
 }
