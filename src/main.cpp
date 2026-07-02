@@ -28,7 +28,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <SPI.h>
-#include "LCD_SharpBoosterPack_SPI.h"
+#include "Screen_ST7735.h"
 
 // ───────── TM4C Low-Level ─────────
 extern "C" {
@@ -44,6 +44,10 @@ extern "C" {
 // ───────── Settings ─────────
 #define VREF 3.3f
 #define ADC_MAXVAL 4095.0f
+
+// Diagnose-Modus: haengt in setup() fest und schaltet nur CS/RST/DC
+// langsam (1Hz), zum Nachmessen mit Multimeter. 0 = normaler Betrieb.
+#define PIN_TEST_MODE 1
 
 #define SERIAL_SHOW_ADC 1
 #define SERIAL_SHOW_IQ  1
@@ -65,8 +69,9 @@ static bool calibrated = false;
 
 static float disp_Iavg = 0, disp_Qavg = 0;
 
-// CS, DISP, VCC; autoVCOM=false (OneMsTaskTimer hat keinen TM4C1294-Zweig -> Linkerfehler)
-LCD_SharpBoosterPack_SPI myScreen(6, 5, 2, false);
+// Default-Pins CS=13(PN2), RST=17(PH3), DC=31(PL3) - siehe SLAU599B Table 2-7
+// und SPMU365 Table 2-1 (EDUMKII- bzw. EK-TM4C1294XL-Handbuch)
+Screen_ST7735 myScreen;
 
 // ───────── Training ─────────
 #define N_CAL 16
@@ -222,33 +227,36 @@ static void demodulate(const float v[3], float* I, float* Q)
 // ───────── Display ─────────
 static void update_display()
 {
-    const uint8_t dy = 12;
-    uint8_t y = 0;
+    const uint16_t dy = 10;
+    uint16_t y = 0;
 
-    myScreen.clearBuffer();
-    myScreen.setFont(0);
+    myScreen.clear(blackColour);
+    myScreen.setFontSize(0);
 
-    myScreen.text(0, y, "Five-Port Detector");
+    myScreen.gText(0, y, "Five-Port Detector", whiteColour);
     y += dy;
 
-    myScreen.text(0, y,
-        "dc:" + String(dc[0],2) + " " + String(dc[1],2) + " " + String(dc[2],2));
+    myScreen.gText(0, y,
+        "dc:" + String(dc[0],2) + " " + String(dc[1],2) + " " + String(dc[2],2),
+        greenColour);
     y += dy;
 
-    myScreen.text(0, y,
-        "rg:" + String(rg[0],1) + " " + String(rg[1],1) + " " + String(rg[2],1));
+    myScreen.gText(0, y,
+        "rg:" + String(rg[0],1) + " " + String(rg[1],1) + " " + String(rg[2],1),
+        greenColour);
     y += dy;
 
-    myScreen.text(0, y,
-        "ig:" + String(ig[0],1) + " " + String(ig[1],1) + " " + String(ig[2],1));
-    y += dy;
+    myScreen.gText(0, y,
+        "ig:" + String(ig[0],1) + " " + String(ig[1],1) + " " + String(ig[2],1),
+        greenColour);
+    y += dy + 4;
 
-    bool ok = (disp_Iavg > 0.25f && disp_Iavg < 0.75f) && (disp_Qavg > 0.25f && disp_Qavg < 0.75f);
-    myScreen.setReverse(!ok);
-    myScreen.text(0, y, "AVG: I=" + String(disp_Iavg, 2) + " Q=" + String(disp_Qavg, 2));
-    myScreen.setReverse(false);
+    uint16_t Icol = (disp_Iavg > 0.25f && disp_Iavg < 0.75f) ? whiteColour : redColour;
+    uint16_t Qcol = (disp_Qavg > 0.25f && disp_Qavg < 0.75f) ? whiteColour : redColour;
 
-    myScreen.flush();
+    myScreen.gText(0, y, "AVG:", whiteColour);
+    myScreen.gText(30, y, "I=" + String(disp_Iavg, 2), Icol);
+    myScreen.gText(78, y, "Q=" + String(disp_Qavg, 2), Qcol);
 }
 
 // ───────── Setup ─────────
@@ -266,22 +274,58 @@ void setup()
     // GPIO-Ports für SPI und Screen-Steuerpins aktivieren
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);  // PD3=SCK, PD1=MOSI (SSI2, BoosterPack 1)
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOD));
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);  // PC6 = LCD DISP
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC));
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);  // PE4=LCD VCC, PE5=LCD CS
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPION);  // PN2=CS
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPION));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOH);  // PH3=RST
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOH));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOL);  // PL3=D/C
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOL));
+
+#if PIN_TEST_MODE
+    // Diagnose: CS/RST/DC einzeln langsam schalten, mit Multimeter an
+    // BoosterPack-Pin 13 (CS), 17 (RST), 31 (DC) gegen GND nachmessbar.
+    // Jeder Pin 1s HIGH (3.3V), dann 1s LOW (0V), nacheinander, endlos.
+    pinMode(PN_2, OUTPUT);
+    pinMode(PH_3, OUTPUT);
+    pinMode(PL_3, OUTPUT);
+    while (true) {
+        Serial.println("CS (Pin13/PN2) HIGH");
+        digitalWrite(PN_2, HIGH); digitalWrite(PH_3, LOW); digitalWrite(PL_3, LOW);
+        delay(1000);
+        Serial.println("CS (Pin13/PN2) LOW");
+        digitalWrite(PN_2, LOW);
+        delay(1000);
+
+        Serial.println("RST (Pin17/PH3) HIGH");
+        digitalWrite(PH_3, HIGH);
+        delay(1000);
+        Serial.println("RST (Pin17/PH3) LOW");
+        digitalWrite(PH_3, LOW);
+        delay(1000);
+
+        Serial.println("DC (Pin31/PL3) HIGH");
+        digitalWrite(PL_3, HIGH);
+        delay(1000);
+        Serial.println("DC (Pin31/PL3) LOW");
+        digitalWrite(PL_3, LOW);
+        delay(1000);
+    }
+#endif
 
     SPI.setModule(2);  // SSI2 auf PD3/PD1 (BoosterPack 1, wo das EduBP MKII steckt)
     myScreen.begin();
-    myScreen.clearBuffer();
-    myScreen.setFont(1);
-    myScreen.text(0, 0, "Initializing...");
-    myScreen.flush();
+    myScreen.clear(redColour);  // Testfarbe: sichtbarer Beweis, dass SPI-Kommandos ankommen
+    myScreen.setFontSize(0);
+    myScreen.gText(0, 0, "Initializing...", whiteColour);
 
     // GPIO
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC));
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
 
     // ADC Pins PE1/PE2/PE3 als Analogeingang
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
     GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
 
     // ADC
