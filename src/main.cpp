@@ -390,13 +390,13 @@ void loop()
 
     float doa = compute_doa(dphi);
 
+    float y = dphi * 180 / M_PI;
+    Serial.print(y);
+    Serial.print(doa);
+
 
     TimerDisable(TIMER0_BASE, TIMER_A);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5, 0);
-
-    
-    Serial.print("dphi=%.2f deg  DOA=%.2f deg\n", dphi*180/M_PI, doa);
-
 
     delay(100);
 }
