@@ -22,6 +22,10 @@
  *   ADC Detektor 1:  A0 = J1-2  (PE3 / AIN0)
  *   ADC Detektor 2:  A1 = J1-6  (PE2 / AIN1)
  *   ADC Detektor 3:  A2 = J1-5  (PE1 / AIN2)
+ * 
+ *   Adc Detektor 4: A3          (PE0 / AIN3)
+ *   Adc Detektor 4: A9          (PE4 / AIN9)
+ *   Adc Detektor 4: A8          (PE5 / AIN8)
  */
 
 #include <Arduino.h>
@@ -43,6 +47,11 @@ extern "C" {
 #define VREF 3.3f
 #define ADC_MAXVAL 4095.0f
 
+
+#define D_ANT 0.01f //anpassen auf richtigen abstand
+#define LAMBDA 
+
+
 #define SERIAL_SHOW_ADC 1
 #define SERIAL_SHOW_IQ  1
 
@@ -53,12 +62,18 @@ extern "C" {
 #define IQ_Q_PIN PC_5
 
 // ───────── Globals ─────────
-volatile uint32_t adc_raw[3];
+volatile uint32_t adc_raw[6];
 volatile bool new_sample_ready = false;
 volatile int sym_idx = 0;
 volatile uint8_t I_sent = 0, Q_sent = 0;
 
-static float rg[3], ig[3], dc[3];
+
+// Button
+volatile bool calibrate_request = false;
+
+
+static float rg1[3], ig1[3], dc1[3];
+static float rg2[3], ig2[3], dc2[3];
 static bool calibrated = false;
 
 // ───────── Training ─────────
@@ -86,6 +101,7 @@ void Timer0IntHandler(void)
     sym_idx = (sym_idx + 1) % N_CAL;
 
     ADCProcessorTrigger(ADC0_BASE, 0);
+
 }
 
 // ───────── ADC ISR ─────────
@@ -99,12 +115,22 @@ void ADC0SS0IntHandler(void)
     new_sample_ready = true;
 }
 
-// ───────── ADC Read ─────────
-static void read_detectors(float v[3])
+
+// ───────── ADC → Float ─────────
+void read_detectors(float v1[3], float v2[3])
 {
-    v[0] = adc_raw[0] * VREF / ADC_MAXVAL;
-    v[1] = adc_raw[1] * VREF / ADC_MAXVAL;
-    v[2] = adc_raw[2] * VREF / ADC_MAXVAL;
+    for(int i=0;i<3;i++){
+        v1[i] = adc_raw[i] * VREF / ADC_MAXVAL;
+        v2[i] = adc_raw[i+3] * VREF / ADC_MAXVAL;
+    }
+}
+
+
+// ───────── Button ISR ─────────
+void ButtonIntHandler(void)
+{
+    GPIOIntClear(GPIO_PORTJ_BASE, GPIO_PIN_0);
+    calibrate_request = true;
 }
 
 // ───────── Matrix Inversion ─────────
@@ -160,9 +186,12 @@ static bool lstsq3(const float A[][3], const float b[], int N, float c[3])
 // ───────── Calibration ─────────
 static void calibrate()
 {
-    static float V[N_CAL][3];
-    static float A[N_CAL][3];
+    static float V1[N_CAL][3];
+    static float A1[N_CAL][3];
     static float Ivec[N_CAL], Qvec[N_CAL];
+
+    static float V2[N_CAL][3];
+    static float A2[N_CAL][3];
 
     Serial.println("Calibrating...");
 
@@ -170,7 +199,7 @@ static void calibrate()
         while(!new_sample_ready);
         new_sample_ready=false;
 
-        read_detectors(V[n]);
+        read_detectors(V1[n], V2[n]);
 
         // Zentrieren: 0→-0.5, 1→+0.5  (macht mean=0, lstsq korrekt)
         Ivec[n] = (float)I_sent - 0.5f;
@@ -179,29 +208,41 @@ static void calibrate()
 
     // dc = Mittelwert der Detektoren
     for(int k=0;k<3;k++){
-        dc[k]=0;
-        for(int n=0;n<N_CAL;n++) dc[k]+=V[n][k];
-        dc[k]/=N_CAL;
+        dc1[k]=0;
+        dc2[k]=0;
+        for(int n=0;n<N_CAL;n++){
+         dc1[k]+=V1[n][k];
+         dc2[k]+=V2[n][k];
+        }
+        dc1[k]/=N_CAL;
+        dc2[k]/=N_CAL;
     }
 
     // Residuen (DC-frei)
     for(int n=0;n<N_CAL;n++)
-        for(int k=0;k<3;k++)
-            A[n][k]=V[n][k]-dc[k];
+        for(int k=0;k<3;k++){
+            A1[n][k]=V1[n][k]-dc1[k];
+            A2[n][k]=V2[n][k]-dc2[k];
+        }
 
     // Inverses Modell: finde rg,ig s.d. Σ rg[k]*ṽ[k] ≈ I-0.5
-    lstsq3(A,Ivec,N_CAL,rg);
-    lstsq3(A,Qvec,N_CAL,ig);
+    lstsq3(A1,Ivec,N_CAL,rg1);
+    lstsq3(A1,Qvec,N_CAL,ig1);
+    lstsq3(A2,Ivec,N_CAL,rg2);
+    lstsq3(A2,Qvec,N_CAL,ig2);
 
     calibrated=true;
     Serial.println("Calibration done");
-    Serial.print("dc:  "); Serial.print(dc[0],4); Serial.print("  "); Serial.print(dc[1],4); Serial.print("  "); Serial.println(dc[2],4);
-    Serial.print("rg:  "); Serial.print(rg[0],4); Serial.print("  "); Serial.print(rg[1],4); Serial.print("  "); Serial.println(rg[2],4);
-    Serial.print("ig:  "); Serial.print(ig[0],4); Serial.print("  "); Serial.print(ig[1],4); Serial.print("  "); Serial.println(ig[2],4);
+    Serial.print("dc1:  "); Serial.print(dc1[0],4); Serial.print("  "); Serial.print(dc1[1],4); Serial.print("  "); Serial.println(dc1[2],4);
+    Serial.print("rg1:  "); Serial.print(rg1[0],4); Serial.print("  "); Serial.print(rg1[1],4); Serial.print("  "); Serial.println(rg1[2],4);
+    Serial.print("ig1:  "); Serial.print(ig1[0],4); Serial.print("  "); Serial.print(ig1[1],4); Serial.print("  "); Serial.println(ig1[2],4);
+    Serial.print("dc2:  "); Serial.print(dc2[0],4); Serial.print("  "); Serial.print(dc2[1],4); Serial.print("  "); Serial.println(dc2[2],4);
+    Serial.print("rg2:  "); Serial.print(rg2[0],4); Serial.print("  "); Serial.print(rg2[1],4); Serial.print("  "); Serial.println(rg2[2],4);
+    Serial.print("ig2:  "); Serial.print(ig2[0],4); Serial.print("  "); Serial.print(ig2[1],4); Serial.print("  "); Serial.println(ig2[2],4);
 }
 
 // ───────── Demod ─────────
-static void demodulate(const float v[3], float* I, float* Q)
+static void demodulate(const float v[3], float rg[3], float ig[3], float dc[3], float* I, float* Q)
 {
     *I = 0.5f;
     *Q = 0.5f;
@@ -210,6 +251,24 @@ static void demodulate(const float v[3], float* I, float* Q)
         *I+=rg[k]*vt;
         *Q+=ig[k]*vt;
     }
+}
+
+
+// ───────── Phase ─────────
+float compute_phase(float I, float Q)
+{
+    return atan2f(Q - 0.5f, I - 0.5f);
+}
+
+// ───────── DOA ─────────
+float compute_doa(float dphi)
+{
+    // clamp
+    float x = dphi * LAMBDA / (2*M_PI*D_ANT);
+    if(x > 1) x = 1;
+    if(x < -1) x = -1;
+
+    return asinf(x) * 180.0f / M_PI;
 }
 
 // ───────── Setup ─────────
@@ -232,16 +291,35 @@ void setup()
     // ADC Pins PE1/PE2/PE3 als Analogeingang
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
-    GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
+    GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3
+                                  | GPIO_PIN_0 | GPIO_PIN_4 | GPIO_PIN_5);
 
     // ADC
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0));
 
     ADCSequenceConfigure(ADC0_BASE,0,ADC_TRIGGER_PROCESSOR,0);
-    ADCSequenceStepConfigure(ADC0_BASE,0,0,ADC_CTL_CH0);
-    ADCSequenceStepConfigure(ADC0_BASE,0,1,ADC_CTL_CH1);
-    ADCSequenceStepConfigure(ADC0_BASE,0,2,ADC_CTL_CH2 | ADC_CTL_IE | ADC_CTL_END);
+    ADCSequenceStepConfigure(ADC0_BASE,0,0,ADC_CTL_CH0); // PE3
+    ADCSequenceStepConfigure(ADC0_BASE,0,1,ADC_CTL_CH1); // PE2
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_CH2); // PE1
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 3, ADC_CTL_CH3); // PE0
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 4, ADC_CTL_CH9); // PE4
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 5,
+        ADC_CTL_CH8 | ADC_CTL_IE | ADC_CTL_END);// PE5
+
+    // Button PJ0
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOJ);
+    GPIOPinTypeGPIOInput(GPIO_PORTJ_BASE, GPIO_PIN_0);
+    GPIOPadConfigSet(GPIO_PORTJ_BASE, GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    
+    GPIOIntTypeSet(GPIO_PORTJ_BASE,
+                GPIO_PIN_0,
+                GPIO_FALLING_EDGE);
+
+    GPIOIntEnable(GPIO_PORTJ_BASE, GPIO_PIN_0);
+    IntEnable(INT_GPIOJ);
+    GPIOIntRegister(GPIO_PORTJ_BASE, ButtonIntHandler);
+
 
     ADCHardwareOversampleConfigure(ADC0_BASE, 64);
     ADCSequenceEnable(ADC0_BASE,0);
@@ -275,44 +353,50 @@ void setup()
 // ───────── Loop ─────────
 void loop()
 {
-    sym_idx = 0;
+    
     TimerEnable(TIMER0_BASE, TIMER_A);
-    calibrate();
+    
+    if(calibrate_request){
+        TimerDisable(TIMER0_BASE, TIMER_A);
+        calibrate_request = false;
+        sym_idx = 0;
+        Serial.print("Calibrating both FP...\n");
+        calibrate();
+        TimerEnable(TIMER0_BASE, TIMER_A);
+    }
+
 
     Serial.println("--- burst ---");
     float I_avg = 0, Q_avg = 0;
-    for(int n = 0; n < N_CAL; n++){
-        while(!new_sample_ready);
-        new_sample_ready = false;
+    while(!new_sample_ready);
+    new_sample_ready = false;
 
-        float v[3];
-        read_detectors(v);
-        float I, Q;
-        demodulate(v, &I, &Q);
-        I_avg += I;
-        Q_avg += Q;
+    float v1[3];
+    float v2[3];
+    read_detectors(v1, v2);
+    float I1,Q1,I2,Q2;
+    demodulate(v1, rg1, ig1, dc1, &I1, &Q1);
+    demodulate(v2, rg2, ig2, dc2, &I2, &Q2);
 
-        if(SERIAL_SHOW_ADC){
-            Serial.print("n="); Serial.print(n);
-            Serial.print(" I_sym="); Serial.print(I_sent);
-            Serial.print(" Q_sym="); Serial.print(Q_sent);
-            Serial.print(" | ADC: ");
-            Serial.print(v[0],4); Serial.print("V  ");
-            Serial.print(v[1],4); Serial.print("V  ");
-            Serial.print(v[2],4); Serial.print("V");
-            Serial.print(" | IQ: ");
-            Serial.print(I,4); Serial.print("  ");
-            Serial.println(Q,4);
-        }
-    }
+
+    float phi1 = compute_phase(I1,Q1);
+    float phi2 = compute_phase(I2,Q2);
+
+    float dphi = phi1 - phi2;
+
+    // unwrap
+    if(dphi > M_PI) dphi -= 2*M_PI;
+    if(dphi < -M_PI) dphi += 2*M_PI;
+
+    float doa = compute_doa(dphi);
+
 
     TimerDisable(TIMER0_BASE, TIMER_A);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5, 0);
 
-    if(SERIAL_SHOW_IQ){
-        Serial.print("AVG I="); Serial.print(I_avg / N_CAL, 4);
-        Serial.print("  Q="); Serial.println(Q_avg / N_CAL, 4);
-    }
+    
+    Serial.print("dphi=%.2f deg  DOA=%.2f deg\n", dphi*180/M_PI, doa);
 
-    delay(1000);
+
+    delay(100);
 }
