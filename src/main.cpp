@@ -391,7 +391,7 @@ void loop()
     float doa = compute_doa(dphi);
 
     float y = dphi * 180 / M_PI;
-    Serial.print(y);
+    Serial.println(y);
     Serial.print(doa);
 
 
