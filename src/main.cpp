@@ -27,6 +27,8 @@
 #include <Arduino.h>
 #include <math.h>
 #include <stdio.h>
+#include <SPI.h>
+#include "LCD_SharpBoosterPack_SPI.h"
 
 // ───────── TM4C Low-Level ─────────
 extern "C" {
@@ -60,6 +62,11 @@ volatile uint8_t I_sent = 0, Q_sent = 0;
 
 static float rg[3], ig[3], dc[3];
 static bool calibrated = false;
+
+static float disp_Iavg = 0, disp_Qavg = 0;
+
+// CS, DISP, VCC; autoVCOM=false (OneMsTaskTimer hat keinen TM4C1294-Zweig -> Linkerfehler)
+LCD_SharpBoosterPack_SPI myScreen(6, 5, 2, false);
 
 // ───────── Training ─────────
 #define N_CAL 16
@@ -212,6 +219,38 @@ static void demodulate(const float v[3], float* I, float* Q)
     }
 }
 
+// ───────── Display ─────────
+static void update_display()
+{
+    const uint8_t dy = 12;
+    uint8_t y = 0;
+
+    myScreen.clearBuffer();
+    myScreen.setFont(0);
+
+    myScreen.text(0, y, "Five-Port Detector");
+    y += dy;
+
+    myScreen.text(0, y,
+        "dc:" + String(dc[0],2) + " " + String(dc[1],2) + " " + String(dc[2],2));
+    y += dy;
+
+    myScreen.text(0, y,
+        "rg:" + String(rg[0],1) + " " + String(rg[1],1) + " " + String(rg[2],1));
+    y += dy;
+
+    myScreen.text(0, y,
+        "ig:" + String(ig[0],1) + " " + String(ig[1],1) + " " + String(ig[2],1));
+    y += dy;
+
+    bool ok = (disp_Iavg > 0.25f && disp_Iavg < 0.75f) && (disp_Qavg > 0.25f && disp_Qavg < 0.75f);
+    myScreen.setReverse(!ok);
+    myScreen.text(0, y, "AVG: I=" + String(disp_Iavg, 2) + " Q=" + String(disp_Qavg, 2));
+    myScreen.setReverse(false);
+
+    myScreen.flush();
+}
+
 // ───────── Setup ─────────
 void setup()
 {
@@ -224,14 +263,25 @@ void setup()
 
     Serial.begin(921600);
 
-    // GPIO
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
+    // GPIO-Ports für SPI und Screen-Steuerpins aktivieren
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);  // PD3=SCK, PD1=MOSI (SSI2, BoosterPack 1)
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOD));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);  // PC6 = LCD DISP
     while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOC));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);  // PE4=LCD VCC, PE5=LCD CS
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
+
+    SPI.setModule(2);  // SSI2 auf PD3/PD1 (BoosterPack 1, wo das EduBP MKII steckt)
+    myScreen.begin();
+    myScreen.clearBuffer();
+    myScreen.setFont(1);
+    myScreen.text(0, 0, "Initializing...");
+    myScreen.flush();
+
+    // GPIO
     GPIOPinTypeGPIOOutput(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5);
 
     // ADC Pins PE1/PE2/PE3 als Analogeingang
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE));
     GPIOPinTypeADC(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3);
 
     // ADC
@@ -309,10 +359,15 @@ void loop()
     TimerDisable(TIMER0_BASE, TIMER_A);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5, 0);
 
+    disp_Iavg = I_avg / N_CAL;
+    disp_Qavg = Q_avg / N_CAL;
+
     if(SERIAL_SHOW_IQ){
-        Serial.print("AVG I="); Serial.print(I_avg / N_CAL, 4);
-        Serial.print("  Q="); Serial.println(Q_avg / N_CAL, 4);
+        Serial.print("AVG I="); Serial.print(disp_Iavg, 4);
+        Serial.print("  Q="); Serial.println(disp_Qavg, 4);
     }
+
+    update_display();
 
     delay(1000);
 }
