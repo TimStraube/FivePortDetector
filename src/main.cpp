@@ -49,7 +49,7 @@ extern "C" {
 
 
 #define D_ANT 0.01f //anpassen auf richtigen abstand
-#define LAMBDA 
+#define LAMBDA 0.1237f
 
 
 #define SERIAL_SHOW_ADC 1
