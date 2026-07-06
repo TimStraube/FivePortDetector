@@ -1,0 +1,226 @@
+
+Calibration done
+dc:  0.0132  0.0177  0.0111
+rg:  10.6635  81.7527  180.8303
+ig:  274.9179  39.5229  -118.0268
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0129V  0.0121V  0.0113V | IQ: 0.0665  0.1643 | err: 0.0665  0.1643 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0185V  0.0113V | IQ: 0.6193  1.0837 | err: -0.3807  1.0837 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0121V  0.0201V  0.0121V | IQ: 0.8625  0.1661 | err: 0.8625  -0.8339 | err_bit: 1  1
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0137V  0.0121V | IQ: 0.3440  0.1329 | err: 0.3440  0.1329 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.8052  0.3558 | err: -0.1948  -0.6442 | err_bit: 0  1
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0121V  0.0201V  0.0121V | IQ: 0.8625  0.1661 | err: 0.8625  -0.8339 | err_bit: 1  1
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0137V  0.0113V | IQ: 0.1983  0.2280 | err: 0.1983  0.2280 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0201V  0.0129V | IQ: 1.0340  0.7356 | err: 0.0340  -0.2644 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=0 | ADC: 0.0113V  0.0201V  0.0121V | IQ: 0.8539  -0.0554 | err: -0.1461  -0.0554 | err_bit: 0  0
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0193V  0.0121V | IQ: 0.8138  0.5774 | err: 0.8138  0.5774 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0153V  0.0185V  0.0121V | IQ: 0.7651  0.9886 | err: -0.2349  -0.0114 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0113V  0.0177V  0.0129V | IQ: 0.8019  -0.2461 | err: -0.1981  -0.2461 | err_bit: 0  0
+n=12 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.8052  0.3558 | err: 0.8052  -0.6442 | err_bit: 1  1
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0137V  0.0129V  0.0121V | IQ: 0.2867  0.3226 | err: -0.7133  -0.6774 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0129V | IQ: 0.9509  0.2607 | err: -0.0491  0.2607 | err_bit: 0  0
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0129V | IQ: 0.9509  0.2607 | err: 0.9509  -0.7393 | err_bit: 1  1
+Fehlerrate Burst: I=37.5%  Q=50.0%
+AVG I=0.6888  Q=0.3435
+Calibrating...
+Calibration done
+dc:  0.0127  0.0173  0.0114
+rg:  45.4264  69.9319  206.5624
+ig:  183.1745  57.5127  -129.0510
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0129V  0.0129V | IQ: 0.4782  -0.0577 | err: 0.4782  -0.0577 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0185V  0.0121V | IQ: 0.8527  0.9612 | err: -0.1473  0.9612 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0201V  0.0105V | IQ: 0.5226  0.8190 | err: 0.5226  -0.1810 | err_bit: 1  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0137V  0.0121V | IQ: 0.3681  0.0926 | err: 0.3681  0.0926 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0201V  0.0121V | IQ: 0.9654  1.0539 | err: -0.0346  0.0539 | err_bit: 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.7992  0.5647 | err: 0.7992  -0.4353 | err_bit: 1  0
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0113V  0.0121V | IQ: 0.2357  0.1012 | err: 0.2357  0.1012 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0153V  0.0185V  0.0129V | IQ: 1.0191  0.8572 | err: 0.0191  -0.1428 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0193V  0.0113V | IQ: 0.5961  0.5211 | err: -0.4039  0.5211 | err_bit: 0  1
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0210V  0.0129V | IQ: 1.0784  0.5534 | err: 1.0784  0.5534 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0113V | IQ: 0.6328  0.6687 | err: -0.3672  -0.3313 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0113V | IQ: 0.6328  0.6687 | err: -0.3672  0.6687 | err_bit: 0  1
+n=12 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.7992  0.5647 | err: 0.7992  -0.4353 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0153V  0.0113V | IQ: 0.3144  0.2893 | err: -0.6856  -0.7107 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0201V  0.0113V | IQ: 0.6891  0.7150 | err: -0.3109  0.7150 | err_bit: 0  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0185V  0.0129V | IQ: 0.9459  0.5619 | err: 0.9459  -0.4381 | err_bit: 1  0
+Fehlerrate Burst: I=37.5%  Q=37.5%
+AVG I=0.6831  Q=0.5584
+Calibrating...
+Calibration done
+dc:  0.0130  0.0167  0.0113
+rg:  -46.8201  101.5365  118.4407
+ig:  110.9360  90.6789  195.0353
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0129V  0.0105V | IQ: 0.0598  -0.1157 | err: 0.0598  -0.1157 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0210V  0.0113V | IQ: 0.8226  1.1298 | err: -0.1774  1.1298 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0226V  0.0121V | IQ: 1.1572  1.2543 | err: 1.1572  0.2543 | err_bit: 1  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0121V  0.0121V | IQ: 0.1689  0.1256 | err: 0.1689  0.1256 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0210V  0.0121V | IQ: 0.9558  1.1976 | err: -0.0442  0.1976 | err_bit: 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0121V  0.0185V  0.0129V | IQ: 0.9190  0.8673 | err: 0.9190  -0.1327 | err_bit: 1  0
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0129V  0.0129V | IQ: 0.3462  0.3558 | err: 0.3462  0.3558 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0153V  0.0193V  0.0121V | IQ: 0.7544  1.1408 | err: -0.2456  0.1408 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0185V  0.0121V | IQ: 0.7858  0.7996 | err: -0.2142  0.7996 | err_bit: 0  1
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0177V  0.0129V | IQ: 0.7617  0.9731 | err: 0.7617  0.9731 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0161V  0.0218V  0.0113V | IQ: 0.8667  1.2923 | err: -0.1333  0.2923 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0137V  0.0201V  0.0121V | IQ: 0.9117  1.0351 | err: -0.0883  1.0351 | err_bit: 0  1
+n=12 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0226V  0.0113V | IQ: 1.0994  1.0078 | err: 1.0994  0.0078 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0145V  0.0121V | IQ: 0.4144  0.3448 | err: -0.5856  -0.6552 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0193V  0.0121V | IQ: 0.9053  0.7832 | err: -0.0947  0.7832 | err_bit: 0  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0177V  0.0121V | IQ: 0.7040  0.7265 | err: 0.7040  -0.2735 | err_bit: 1  0
+Fehlerrate Burst: I=37.5%  Q=37.5%
+AVG I=0.7271  Q=0.8074
+Calibrating...
+Calibration done
+dc:  0.0128  0.0176  0.0116
+rg:  74.2336  135.1390  -470.4651
+ig:  300.7702  4.7657  376.9810
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0113V  0.0129V  0.0121V | IQ: -0.4821  0.2131 | err: -0.4821  0.2131 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0193V  0.0113V | IQ: 1.0075  0.9095 | err: 0.0075  0.9095 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0145V  0.0185V  0.0105V | IQ: 1.2777  0.6019 | err: 1.2777  -0.3981 | err_bit: 1  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0113V  0.0121V  0.0121V | IQ: -0.5910  0.2092 | err: -0.5910  0.2092 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0193V  0.0121V | IQ: 0.6284  1.2133 | err: -0.3716  0.2133 | err_bit: 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0121V  0.0218V  0.0121V | IQ: 0.7756  0.4977 | err: 0.7756  -0.5023 | err_bit: 1  1
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0113V  0.0129V  0.0129V | IQ: -0.8613  0.5169 | err: -0.8613  0.5169 | err_bit: 0  1
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0153V  0.0193V  0.0129V | IQ: 0.3091  1.7595 | err: -0.6909  0.7595 | err_bit: 1  0
+n=8 I_sym=1 Q_sym=1 | ADC: 0.0137V  0.0193V  0.0121V | IQ: 0.5686  0.9709 | err: -0.4314  0.9709 | err_bit: 0  1
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0129V | IQ: 0.1296  1.0324 | err: 0.1296  1.0324 | err_bit: 0  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0218V  0.0121V | IQ: 0.9551  1.2248 | err: -0.0449  0.2248 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0105V  0.0185V  0.0113V | IQ: 0.5995  -0.3062 | err: -0.4005  -0.3062 | err_bit: 0  0
+n=12 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0201V  0.0129V | IQ: 0.2983  1.2786 | err: 0.2983  0.2786 | err_bit: 0  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0121V  0.0129V | IQ: -0.9103  0.7554 | err: -1.9103  -0.2446 | err_bit: 1  0
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0185V  0.0121V | IQ: 0.3998  0.7247 | err: -0.6002  0.7247 | err_bit: 1  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0201V  0.0121V | IQ: 0.6177  0.7324 | err: 0.6177  -0.2676 | err_bit: 1  0
+Fehlerrate Burst: I=37.5%  Q=37.5%
+AVG I=0.2951  Q=0.7709
+Calibrating...
+Calibration done
+dc:  0.0125  0.0177  0.0114
+rg:  70.6317  68.8122  -203.6734
+ig:  271.2045  34.5072  278.8872
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0137V  0.0129V | IQ: -0.1170  0.6594 | err: -0.1170  0.6594 | err_bit: 0  1
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0169V  0.0193V  0.0129V | IQ: 0.6127  2.1654 | err: -0.3873  2.1654 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.4922  0.8479 | err: 0.4922  -0.1521 | err_bit: 0  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0129V  0.0113V | IQ: 0.1558  0.1821 | err: 0.1558  0.1821 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0201V  0.0129V | IQ: 0.4974  1.5375 | err: -0.5026  0.5375 | err_bit: 1  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0185V  0.0121V | IQ: 0.4367  0.8201 | err: 0.4367  -0.1799 | err_bit: 0  0
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0129V  0.0113V | IQ: 0.2127  0.4007 | err: 0.2127  0.4007 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0185V  0.0121V | IQ: 0.5506  1.2572 | err: -0.4494  0.2572 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0210V  0.0121V | IQ: 0.5462  0.6849 | err: -0.4538  0.6849 | err_bit: 0  1
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0145V  0.0185V  0.0137V | IQ: 0.2223  1.7067 | err: 0.2223  1.7067 | err_bit: 0  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0137V  0.0185V  0.0113V | IQ: 0.6578  0.8139 | err: -0.3422  -0.1861 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0177V  0.0121V | IQ: 0.3244  0.5737 | err: -0.6756  0.5737 | err_bit: 1  1
+n=12 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0193V  0.0121V | IQ: 0.5491  1.0664 | err: 0.5491  0.0664 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0137V  0.0113V | IQ: 0.2112  0.2099 | err: -0.7888  -0.7901 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0177V  0.0121V | IQ: 0.3244  0.5737 | err: -0.6756  0.5737 | err_bit: 1  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0177V  0.0129V | IQ: 0.2741  1.2356 | err: 0.2741  0.2356 | err_bit: 0  0
+Fehlerrate Burst: I=31.2%  Q=43.7%
+AVG I=0.3719  Q=0.9209
+Calibrating...
+Calibration done
+dc:  0.0128  0.0178  0.0114
+rg:  135.2410  30.6168  -376.8769
+ig:  53.9182  96.5223  404.7794
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0129V  0.0113V | IQ: 0.3120  -0.0707 | err: 0.3120  -0.0707 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0137V  0.0185V  0.0113V | IQ: 0.7027  0.5606 | err: -0.2973  0.5606 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.3147  0.9212 | err: 0.3147  -0.0788 | err_bit: 0  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0137V  0.0121V | IQ: 0.0330  0.3332 | err: 0.0330  0.3332 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0201V  0.0129V | IQ: 0.3626  1.4555 | err: -0.6374  0.4555 | err_bit: 1  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0201V  0.0129V | IQ: 0.0356  1.3252 | err: 0.0356  0.3252 | err_bit: 0  0
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0121V  0.0113V | IQ: 0.2873  -0.1485 | err: 0.2873  -0.1485 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0137V  0.0193V  0.0113V | IQ: 0.7274  0.6384 | err: -0.2726  -0.3616 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=1 | ADC: 0.0129V  0.0153V  0.0113V | IQ: 0.4950  0.2061 | err: -0.5050  0.2061 | err_bit: 1  0
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0185V  0.0113V | IQ: 0.7027  0.5606 | err: 0.7027  0.5606 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0161V  0.0226V  0.0121V | IQ: 0.8493  1.4061 | err: -0.1507  0.4061 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0201V  0.0113V | IQ: 0.6430  0.6728 | err: -0.3570  0.6728 | err_bit: 0  1
+n=12 I_sym=0 Q_sym=1 | ADC: 0.0145V  0.0193V  0.0121V | IQ: 0.5326  1.0081 | err: 0.5326  0.0081 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0105V  0.0129V  0.0121V | IQ: -0.2097  0.1686 | err: -1.2097  -0.8314 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0177V  0.0121V | IQ: 0.1563  0.7222 | err: -0.8437  0.7222 | err_bit: 1  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.3147  0.9212 | err: 0.3147  -0.0788 | err_bit: 0  0
+Fehlerrate Burst: I=37.5%  Q=31.2%
+AVG I=0.3912  Q=0.6675
+Calibrating...
+Calibration done
+dc:  0.0127  0.0176  0.0117
+rg:  100.2569  62.3500  -108.5113
+ig:  173.6174  66.9181  90.7112
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0113V  0.0137V  0.0121V | IQ: 0.0785  0.0276 | err: 0.0785  0.0276 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0234V  0.0129V | IQ: 0.9172  1.3075 | err: -0.0828  1.3075 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0145V  0.0193V  0.0129V | IQ: 0.6660  1.0378 | err: 0.6660  0.0378 | err_bit: 1  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0137V  0.0113V | IQ: 0.2468  0.0944 | err: 0.2468  0.0944 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0177V  0.0129V | IQ: 0.6463  1.0699 | err: -0.3537  0.0699 | err_bit: 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0177V  0.0121V | IQ: 0.5722  0.7170 | err: 0.5722  -0.2830 | err_bit: 1  0
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0121V  0.0121V | IQ: 0.0589  0.0597 | err: 0.0589  0.0597 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0153V  0.0201V  0.0113V | IQ: 0.9719  1.0855 | err: -0.0281  0.0855 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0185V  0.0121V | IQ: 0.4608  0.4911 | err: -0.5392  0.4911 | err_bit: 1  0
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0185V  0.0113V | IQ: 0.7098  0.6978 | err: 0.7098  0.6978 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0193V  0.0129V | IQ: 0.6660  1.0378 | err: -0.3340  0.0378 | err_bit: 0  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0185V  0.0121V | IQ: 0.4608  0.4911 | err: -0.5392  0.4911 | err_bit: 1  0
+n=12 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0210V  0.0121V | IQ: 0.7731  0.9327 | err: 0.7731  -0.0673 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0121V  0.0121V  0.0113V | IQ: 0.1463  -0.0134 | err: 0.1463  -0.0134 | err_bit: 0  0
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0121V | IQ: 0.5919  0.6849 | err: -0.4081  0.6849 | err_bit: 0  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0201V  0.0113V | IQ: 0.8103  0.8057 | err: 0.8103  -0.1943 | err_bit: 1  0
+Fehlerrate Burst: I=43.7%  Q=18.7%
+AVG I=0.5486  Q=0.6579
+Calibrating...
+Calibration done
+dc:  0.0123  0.0182  0.0113
+rg:  -4.3721  84.1090  346.5985
+ig:  138.7955  90.0644  -146.8070
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0113V  0.0137V  0.0113V | IQ: 0.1101  -0.0431 | err: 0.1101  -0.0431 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.0185V  0.0129V | IQ: 1.0578  0.7150 | err: 0.0578  0.7150 | err_bit: 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0185V  0.0129V | IQ: 1.0649  0.4913 | err: 1.0649  -0.5087 | err_bit: 1  1
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0129V  0.0105V | IQ: -0.2405  0.1144 | err: -0.2405  0.1144 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0210V  0.0121V | IQ: 0.9854  0.9392 | err: -0.0146  -0.0608 | err_bit: 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0129V | IQ: 1.1362  0.4520 | err: 1.1362  -0.5480 | err_bit: 1  1
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0113V  0.0129V  0.0121V | IQ: 0.3217  -0.2340 | err: 0.3217  -0.2340 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0210V  0.0129V | IQ: 1.2647  0.8209 | err: 0.2647  -0.1791 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0129V | IQ: 1.1362  0.4520 | err: 0.1362  0.4520 | err_bit: 0  0
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0201V  0.0129V | IQ: 1.2004  0.6364 | err: 1.2004  0.6364 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0137V  0.0193V  0.0137V | IQ: 1.4120  0.4456 | err: 0.4120  -0.5544 | err_bit: 0  1
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0201V  0.0113V | IQ: 0.6489  0.6494 | err: -0.3511  0.6494 | err_bit: 0  1
+n=12 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0201V  0.0113V | IQ: 0.6453  0.7612 | err: 0.6453  -0.2388 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0113V  0.0137V  0.0121V | IQ: 0.3895  -0.1614 | err: -0.6105  -1.1614 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0177V  0.0129V | IQ: 1.0006  0.3069 | err: 0.0006  0.3069 | err_bit: 0  0
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0193V  0.0129V | IQ: 1.1327  0.5639 | err: 1.1327  -0.4361 | err_bit: 1  0
+Fehlerrate Burst: I=37.5%  Q=43.7%
+AVG I=0.8291  Q=0.4318
+Calibrating...
+Calibration done
+dc:  0.0129  0.0177  0.0113
+rg:  -198.4540  147.7548  87.0950
+ig:  107.6924  114.4185  214.3149
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+n=0 I_sym=1 Q_sym=1 | ADC: 0.0113V  0.0129V  0.0121V | IQ: 0.1831  -0.0483 | err: 0.1831  -0.0483 | err_bit: 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0193V  0.0121V | IQ: 0.4959  1.0365 | err: -0.5041  1.0365 | err_bit: 1  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0193V  0.0113V | IQ: 0.7456  0.6902 | err: 0.7456  -0.3098 | err_bit: 1  0
+n=3 I_sym=0 Q_sym=0 | ADC: 0.0121V  0.0145V  0.0129V | IQ: 0.3315  0.3956 | err: 0.3315  0.3956 | err_bit: 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.0201V  0.0121V | IQ: 0.6150  1.1287 | err: -0.3850  0.1287 | err_bit: 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0129V  0.0185V  0.0129V | IQ: 0.7669  0.9434 | err: 0.7669  -0.0566 | err_bit: 1  0
+n=6 I_sym=0 Q_sym=0 | ADC: 0.0113V  0.0137V  0.0121V | IQ: 0.3021  0.0439 | err: 0.3021  0.0439 | err_bit: 0  0
+n=7 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0201V  0.0129V | IQ: 0.6852  1.3014 | err: -0.3148  0.3014 | err_bit: 0  0
+n=8 I_sym=1 Q_sym=1 | ADC: 0.0129V  0.0185V  0.0113V | IQ: 0.6265  0.5980 | err: -0.3735  0.5980 | err_bit: 0  1
+n=9 I_sym=0 Q_sym=0 | ADC: 0.0137V  0.0193V  0.0121V | IQ: 0.6558  0.9497 | err: 0.6558  0.9497 | err_bit: 1  1
+n=10 I_sym=1 Q_sym=1 | ADC: 0.0145V  0.0193V  0.0113V | IQ: 0.4257  0.8637 | err: -0.5743  -0.1363 | err_bit: 1  0
+n=11 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.0201V  0.0121V | IQ: 0.9348  0.9551 | err: -0.0652  0.9551 | err_bit: 0  1
+n=12 I_sym=0 Q_sym=0 | ADC: 0.0129V  0.0193V  0.0129V | IQ: 0.8860  1.0356 | err: 0.8860  0.0356 | err_bit: 1  0
+n=13 I_sym=1 Q_sym=1 | ADC: 0.0129V  0.0129V  0.0121V | IQ: -0.1368  0.1252 | err: -1.1368  -0.8748 | err_bit: 1  1
+n=14 I_sym=1 Q_sym=0 | ADC: 0.0121V  0.0185V  0.0121V | IQ: 0.8566  0.6839 | err: -0.1434  0.6839 | err_bit: 0  1
+n=15 I_sym=0 Q_sym=1 | ADC: 0.0137V  0.0210V  0.0121V | IQ: 0.8940  1.1341 | err: 0.8940  0.1341 | err_bit: 1  0
+Fehlerrate Burst: I=50.0%  Q=37.5%
+AVG I=0.5792  Q=0.7398
+Calibrating...

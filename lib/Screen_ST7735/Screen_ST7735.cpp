@@ -87,49 +87,54 @@ void Screen_ST7735::begin()
     _writeCommand(ST7735_SLPOUT);
     delay(200);
 
+    // Werte laut Crystalfontz-Referenzcode fuer CFAF128128B(1)-0145T
+    // (github.com/crystalfontz/CFAF128128B1-0145T), nicht die generischen
+    // Adafruit-"greentab"-Werte - dieser Chip braucht die eigenen Timings.
     _writeCommand(ST7735_FRMCTR1);
-    _writeData(0x01); _writeData(0x2C); _writeData(0x2D);
+    _writeData(0x02); _writeData(0x35); _writeData(0x36);
     _writeCommand(ST7735_FRMCTR2);
-    _writeData(0x01); _writeData(0x2C); _writeData(0x2D);
+    _writeData(0x02); _writeData(0x35); _writeData(0x36);
     _writeCommand(ST7735_FRMCTR3);
-    _writeData(0x01); _writeData(0x2C); _writeData(0x2D);
-    _writeData(0x01); _writeData(0x2C); _writeData(0x2D);
+    _writeData(0x02); _writeData(0x35); _writeData(0x36);
+    _writeData(0x02); _writeData(0x35); _writeData(0x36);
 
     _writeCommand(ST7735_INVCTR);
     _writeData(0x07);
 
     _writeCommand(ST7735_PWCTR1);
-    _writeData(0xA2); _writeData(0x02); _writeData(0x84);
+    _writeData(0x02); _writeData(0x02);
     _writeCommand(ST7735_PWCTR2);
     _writeData(0xC5);
     _writeCommand(ST7735_PWCTR3);
-    _writeData(0x0A); _writeData(0x00);
+    _writeData(0x0D); _writeData(0x00);
     _writeCommand(ST7735_PWCTR4);
-    _writeData(0x8A); _writeData(0x2A);
+    _writeData(0x8D); _writeData(0x1A);
     _writeCommand(ST7735_PWCTR5);
-    _writeData(0x8A); _writeData(0xEE);
+    _writeData(0x8D); _writeData(0xEE);
 
     _writeCommand(ST7735_VMCTR1);
-    _writeData(0x0E);
+    _writeData(0x51); _writeData(0x4D);
 
     _writeCommand(ST7735_INVOFF);
 
     _writeCommand(ST7735_MADCTL);
-    _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB);
+    // BGR statt RGB: dieses Panel hat vertauschte Sub-Pixel, sonst
+    // erscheint z.B. redColour als Blau (klassisches ST7735-Klon-Problem).
+    _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR);
 
     _writeCommand(ST7735_COLMOD);
     _writeData(0x05);  // 16 bit/pixel
 
     _writeCommand(ST7735_GMCTRP1);
-    _writeData(0x02); _writeData(0x1c); _writeData(0x07); _writeData(0x12);
-    _writeData(0x37); _writeData(0x32); _writeData(0x29); _writeData(0x2d);
-    _writeData(0x29); _writeData(0x25); _writeData(0x2B); _writeData(0x39);
-    _writeData(0x00); _writeData(0x01); _writeData(0x03); _writeData(0x10);
+    _writeData(0x0a); _writeData(0x1c); _writeData(0x0c); _writeData(0x14);
+    _writeData(0x33); _writeData(0x2b); _writeData(0x24); _writeData(0x28);
+    _writeData(0x27); _writeData(0x25); _writeData(0x2C); _writeData(0x39);
+    _writeData(0x00); _writeData(0x05); _writeData(0x03); _writeData(0x0d);
     _writeCommand(ST7735_GMCTRN1);
-    _writeData(0x03); _writeData(0x1d); _writeData(0x07); _writeData(0x06);
-    _writeData(0x2E); _writeData(0x2C); _writeData(0x29); _writeData(0x2D);
-    _writeData(0x2E); _writeData(0x2E); _writeData(0x37); _writeData(0x3F);
-    _writeData(0x00); _writeData(0x00); _writeData(0x02); _writeData(0x10);
+    _writeData(0x0a); _writeData(0x1c); _writeData(0x0c); _writeData(0x14);
+    _writeData(0x33); _writeData(0x2b); _writeData(0x24); _writeData(0x28);
+    _writeData(0x27); _writeData(0x25); _writeData(0x2D); _writeData(0x3a);
+    _writeData(0x00); _writeData(0x05); _writeData(0x03); _writeData(0x0d);
 
     _writeCommand(ST7735_NORON);
     delay(10);
@@ -138,6 +143,7 @@ void Screen_ST7735::begin()
 
     _screenWidth  = ST7735_WIDTH;
     _screenHeigth = ST7735_HEIGHT;
+    _orientation = 0;
     _penSolid  = false;
     _fontSolid = true;
     _flagRead  = false;
@@ -171,16 +177,16 @@ void Screen_ST7735::setOrientation(uint8_t orientation)
     _writeCommand(ST7735_MADCTL);
     switch (_orientation) {
         case 0:
-            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR);
             break;
         case 1:
-            _writeData(ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_BGR);
             break;
         case 2:
-            _writeData(ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_BGR);
             break;
         case 3:
-            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_BGR);
             break;
     }
 }

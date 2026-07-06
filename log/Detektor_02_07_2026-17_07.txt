@@ -1,0 +1,316 @@
+| IQ: 0.9732  0.0033 | err: -0.0268  0.0033 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4261  Q=0.5940
+Calibrating...
+Calibration done
+dc:  0.0689  0.0503  0.0562
+rg:  1.6715  -21.6299  -21.8715
+ig:  13.5341  12.1262  20.4965
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0814V  0.0403V | IQ: 0.0909  -0.1185 | err: 0.0909  -0.1185 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.1096V  0.0145V  0.0685V | IQ: 1.0716  0.8701 | err: 0.0716  -0.1299 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0596V  0.0467V  0.0919V | IQ: -0.2203  1.0637 | err: -0.2203  0.0637 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0201V  0.0814V  0.0387V | IQ: 0.1275  -0.1406 | err: 0.1275  -0.1406 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0693V  0.0693V  0.0314V | IQ: 0.6298  0.2294 | err: -0.3702  0.2294 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0612V  0.0540V  0.0919V | IQ: -0.3744  1.1735 | err: -0.3744  0.1735 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.1096V  0.0161V  0.0693V | IQ: 1.0191  0.9061 | err: 0.0191  -0.0939 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0693V  0.0717V  0.0306V | IQ: 0.5951  0.2422 | err: -0.4049  0.2422 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0604V  0.0532V  0.0919V | IQ: -0.3584  1.1528 | err: -0.3584  1.1528 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.1096V  0.0193V  0.0701V | IQ: 0.9318  0.9617 | err: -0.0682  -0.0383 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0693V  0.0645V  0.0338V | IQ: 0.6815  0.2204 | err: 0.6815  -0.7796 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0806V  0.0387V | IQ: 0.1422  -0.1722 | err: 0.1422  -0.1722 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.1096V  0.0145V  0.0693V | IQ: 1.0540  0.8866 | err: 0.0540  0.8866 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0604V  0.0548V  0.0911V | IQ: -0.3756  1.1559 | err: -0.3756  0.1559 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0193V  0.0806V  0.0395V | IQ: 0.1260  -0.1448 | err: 0.1260  -0.1448 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0701V  0.0621V  0.0330V | IQ: 0.7527  0.1854 | err: -0.2473  0.1854 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.3683  Q=0.5295
+Calibrating...
+Calibration done
+dc:  0.0318  0.0864  0.0772
+rg:  5.0213  -2.0801  15.6763
+ig:  26.0354  20.9551  -1.4736
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0177V  0.0806V  0.0403V | IQ: -0.1373  0.0672 | err: -0.1373  0.0672 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0443V  0.0983V  0.0911V | IQ: 0.7553  1.0562 | err: -0.2447  0.0562 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0177V  0.1193V  0.0701V | IQ: 0.2497  0.8338 | err: 0.2497  -0.1662 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0201V  0.0798V  0.0379V | IQ: -0.1613  0.1168 | err: -0.1613  0.1168 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0355V  0.0612V  0.0943V | IQ: 0.8384  0.0439 | err: -0.1616  0.0439 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0169V  0.1177V  0.0701V | IQ: 0.2490  0.7791 | err: 0.2490  -0.2209 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0443V  0.1032V  0.0903V | IQ: 0.7326  1.1588 | err: -0.2674  0.1588 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0355V  0.0604V  0.0935V | IQ: 0.8274  0.0282 | err: -0.1726  0.0282 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.1193V  0.0709V | IQ: 0.2664  0.8536 | err: 0.2664  0.8536 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0443V  0.1015V  0.0903V | IQ: 0.7359  1.1250 | err: -0.2641  0.1250 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0347V  0.0596V  0.0943V | IQ: 0.8377  -0.0109 | err: 0.8377  -1.0109 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0177V  0.0766V  0.0395V | IQ: -0.1415  -0.0161 | err: -0.1415  -0.0161 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0435V  0.1023V  0.0903V | IQ: 0.7302  1.1209 | err: -0.2698  0.1209 | err_bit(0=richtig,1=falsch): 0  0
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0169V  0.1185V  0.0693V | IQ: 0.2347  0.7971 | err: 0.2347  -0.2029 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0185V  0.0790V  0.0395V | IQ: -0.1425  0.0556 | err: -0.1425  0.0556 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0363V  0.0661V  0.0935V | IQ: 0.8198  0.1674 | err: -0.1802  0.1674 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4184  Q=0.5110
+Calibrating...
+Calibration done
+dc:  0.0370  0.1111  0.0395
+rg:  -113.2718  85.6416  -99.3939
+ig:  117.0358  -51.0350  95.6377
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0201V  0.0822V  0.0411V | IQ: -0.2306  0.1608 | err: -0.2306  0.1608 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0524V  0.1233V  0.0282V | IQ: 0.9195  0.6027 | err: -0.0805  -0.3973 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0621V  0.1128V  0.0153V | IQ: 0.2085  1.0360 | err: 0.2085  0.0360 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0193V  0.0806V  0.0411V | IQ: -0.2774  0.1487 | err: -0.2774  0.1487 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0137V  0.1168V  0.0661V | IQ: 0.9843  0.0270 | err: -0.0157  0.0270 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=0 | ADC: 0.0621V  0.1128V  0.0161V | IQ: 0.1284  1.1131 | err: 0.1284  0.1131 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0556V  0.1233V  0.0290V | IQ: 0.4742  1.0571 | err: -0.5258  0.0571 | err_bit(0=richtig,1=falsch): 1  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.1185V  0.0661V | IQ: 1.2136  -0.1496 | err: 0.2136  -0.1496 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0637V  0.1144V  0.0137V | IQ: 0.3241  0.9883 | err: 0.3241  0.9883 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0548V  0.1233V  0.0282V | IQ: 0.6456  0.8857 | err: -0.3544  -0.1143 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0145V  0.1185V  0.0653V | IQ: 1.1111  -0.0380 | err: 1.1111  -1.0380 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0846V  0.0395V | IQ: 0.3192  -0.3054 | err: 0.3192  -0.3054 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0540V  0.1241V  0.0290V | IQ: 0.7258  0.8273 | err: -0.2742  0.8273 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0629V  0.1136V  0.0145V | IQ: 0.2663  1.0121 | err: 0.2663  0.0121 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0177V  0.0766V  0.0411V | IQ: -0.4399  0.1657 | err: -0.4399  0.1657 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0137V  0.1177V  0.0645V | IQ: 1.2135  -0.1683 | err: 0.2135  -0.1683 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4741  Q=0.4602
+Calibrating...
+Calibration done
+dc:  0.0693  0.0777  0.0297
+rg:  1.4460  -9.5926  -45.3108
+ig:  16.3207  9.0216  28.0935
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0790V  0.0419V | IQ: -0.1366  0.0383 | err: -0.1366  0.0383 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.1144V  0.0870V  0.0210V | IQ: 0.8730  1.0744 | err: -0.1270  0.0744 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0854V  0.0290V  0.0508V | IQ: 0.0366  0.9151 | err: 0.0366  -0.0849 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0210V  0.0806V  0.0403V | IQ: -0.0767  0.0339 | err: -0.0767  0.0339 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0516V  0.1064V  0.0153V | IQ: 0.8521  0.0645 | err: -0.1479  0.0645 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0854V  0.0306V  0.0508V | IQ: 0.0211  0.9296 | err: 0.0211  -0.0704 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.1136V  0.0870V  0.0234V | IQ: 0.7623  1.1291 | err: -0.2377  0.1291 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0508V  0.1088V  0.0145V | IQ: 0.8643  0.0505 | err: -0.1357  0.0505 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0854V  0.0234V  0.0532V | IQ: -0.0189  0.9321 | err: -0.0189  0.9321 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.1136V  0.0846V  0.0218V | IQ: 0.8585  1.0621 | err: -0.1415  0.0621 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0500V  0.1080V  0.0153V | IQ: 0.8344  0.0528 | err: 0.8344  -0.9472 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0201V  0.0790V  0.0395V | IQ: -0.0259  -0.0164 | err: -0.0259  -0.0164 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.1144V  0.0862V  0.0226V | IQ: 0.8077  1.1124 | err: -0.1923  0.1124 | err_bit(0=richtig,1=falsch): 0  0
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0862V  0.0258V  0.0516V | IQ: 0.0321  0.9218 | err: 0.0321  -0.0782 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0210V  0.0782V  0.0411V | IQ: -0.0900  0.0347 | err: -0.0900  0.0347 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0540V  0.1072V  0.0153V | IQ: 0.8479  0.1112 | err: -0.1521  0.1112 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4026  Q=0.5279
+Calibrating...
+Calibration done
+dc:  0.0584  0.0498  0.0704
+rg:  -14.7052  -27.2992  11.8999
+ig:  35.0770  29.1483  -0.3054
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0177V  0.0790V  0.0379V | IQ: -0.0842  -0.0675 | err: -0.0842  -0.0675 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0927V  0.0274V  0.0862V | IQ: 0.7970  1.0432 | err: -0.2030  0.0432 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0403V  0.0854V  0.0951V | IQ: 0.0888  0.8944 | err: 0.0888  -0.1056 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0193V  0.0790V  0.0387V | IQ: -0.0984  -0.0113 | err: -0.0984  -0.0113 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0645V  0.0201V  0.0564V | IQ: 1.0550  -0.1484 | err: 0.0550  -0.1484 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=0 | ADC: 0.0395V  0.0870V  0.0959V | IQ: 0.0663  0.9128 | err: 0.0663  -0.0872 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0943V  0.0250V  0.0870V | IQ: 0.8489  1.0290 | err: -0.1511  0.0290 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0653V  0.0201V  0.0580V | IQ: 1.0623  -0.1207 | err: 0.0623  -0.1207 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0822V  0.0379V | IQ: -0.1841  0.0547 | err: -0.1841  0.0547 | err_bit(0=richtig,1=falsch): 0  0
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0919V  0.0282V  0.0878V | IQ: 0.8060  1.0379 | err: -0.1940  0.0379 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0645V  0.0218V  0.0580V | IQ: 1.0301  -0.1020 | err: 1.0301  -1.1020 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0177V  0.0814V  0.0387V | IQ: -0.1407  0.0027 | err: -0.1407  0.0027 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0927V  0.0290V  0.0878V | IQ: 0.7722  1.0897 | err: -0.2278  1.0897 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0371V  0.0886V  0.0959V | IQ: 0.0578  0.8750 | err: 0.0578  -0.1250 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0201V  0.0782V  0.0395V | IQ: -0.0786  -0.0067 | err: -1.0786  -1.0067 | err_bit(0=richtig,1=falsch): 1  1
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0661V  0.0201V  0.0564V | IQ: 1.0313  -0.0919 | err: 0.0313  -0.0919 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4394  Q=0.3994
+Calibrating...
+Calibration done
+dc:  0.0244  0.1016  0.0690
+rg:  20.9856  -0.3988  17.4825
+ig:  51.8110  18.5939  -7.5851
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0782V  0.0403V | IQ: -0.1151  -0.0214 | err: -0.1151  -0.0214 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0306V  0.1160V  0.0782V | IQ: 0.7856  1.0219 | err: -0.2144  0.0219 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0210V  0.1225V  0.0484V | IQ: 0.0588  0.8669 | err: 0.0588  -0.1331 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0185V  0.0822V  0.0387V | IQ: -0.1449  0.0658 | err: -0.1449  0.0658 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0226V  0.0870V  0.0951V | IQ: 0.9239  -0.0634 | err: -0.0761  -0.0634 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0201V  0.1249V  0.0484V | IQ: 0.0409  0.8701 | err: 0.0409  -0.1299 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0306V  0.1128V  0.0774V | IQ: 0.7728  0.9681 | err: -0.2272  -0.0319 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0226V  0.0878V  0.0951V | IQ: 0.9236  -0.0484 | err: -0.0764  -0.0484 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0210V  0.1249V  0.0475V | IQ: 0.0437  0.9180 | err: 0.0437  0.9180 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0282V  0.1136V  0.0766V | IQ: 0.7076  0.8639 | err: -0.2924  -0.1361 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0226V  0.0935V  0.0951V | IQ: 0.9213  0.0564 | err: 0.9213  -0.9436 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0774V  0.0403V | IQ: -0.1148  -0.0363 | err: -0.1148  -0.0363 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0314V  0.1168V  0.0774V | IQ: 0.7881  1.0847 | err: -0.2119  1.0847 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0226V  0.1225V  0.0467V | IQ: 0.0644  0.9626 | err: 0.0644  -0.0374 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0185V  0.0782V  0.0403V | IQ: -0.1151  -0.0214 | err: -0.1151  -0.0214 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0226V  0.0903V  0.0951V | IQ: 0.9226  -0.0035 | err: -0.0774  -0.0035 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4040  Q=0.4678
+Calibrating...
+Calibration done
+dc:  0.0468  0.1081  0.0293
+rg:  0.4018  28.9765  9.0863
+ig:  61.5343  -2.4187  99.0467
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0758V  0.0403V | IQ: -0.3492  -0.0214 | err: -0.3492  -0.0214 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0758V  0.1193V  0.0177V | IQ: 0.7294  1.1097 | err: -0.2706  0.1097 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0774V  0.0983V  0.0161V | IQ: 0.1082  1.0999 | err: 0.1082  0.0999 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0193V  0.0854V  0.0395V | IQ: -0.0764  -0.1246 | err: -0.0764  -0.1246 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0193V  0.1241V  0.0411V | IQ: 1.0591  -0.0585 | err: 0.0591  -0.0585 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0774V  0.1007V  0.0161V | IQ: 0.1783  1.0940 | err: 0.1783  0.0940 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0782V  0.1209V  0.0177V | IQ: 0.7770  1.2545 | err: -0.2230  0.2545 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0201V  0.1233V  0.0411V | IQ: 1.0361  -0.0069 | err: 0.0361  -0.0069 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0774V  0.1015V  0.0153V | IQ: 0.1943  1.0123 | err: 0.1943  1.0123 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0766V  0.1177V  0.0185V | IQ: 0.6903  1.2430 | err: -0.3097  0.2430 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0185V  0.1225V  0.0411V | IQ: 1.0121  -0.1042 | err: 1.0121  -1.1042 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0806V  0.0411V | IQ: -0.2021  -0.0028 | err: -0.2021  -0.0028 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0774V  0.1168V  0.0169V | IQ: 0.6526  1.1349 | err: -0.3474  1.1349 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0774V  0.0999V  0.0161V | IQ: 0.1549  1.0960 | err: 0.1549  0.0960 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0193V  0.0806V  0.0403V | IQ: -0.2091  -0.0331 | err: -0.2091  -0.0331 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0185V  0.1209V  0.0395V | IQ: 0.9508  -0.2599 | err: -0.0492  -0.2599 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4191  Q=0.5271
+Calibrating...
+Calibration done
+dc:  0.0730  0.0624  0.0400
+rg:  2.4188  -24.6617  -50.2770
+ig:  18.2453  25.7967  46.4989
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0210V  0.0798V  0.0387V | IQ: 0.0115  -0.0619 | err: 0.0115  -0.0619 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.1177V  0.0500V  0.0379V | IQ: 1.0212  0.8958 | err: 0.0212  -0.1042 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0790V  0.0153V  0.0709V | IQ: 0.1211  0.8325 | err: 0.1211  -0.1675 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0193V  0.0838V  0.0403V | IQ: -0.1728  0.0876 | err: -0.1728  0.0876 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0629V  0.0943V  0.0177V | IQ: 0.8085  0.1026 | err: -0.1915  0.1026 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0790V  0.0153V  0.0725V | IQ: 0.0400  0.9074 | err: 0.0400  -0.0926 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.1177V  0.0516V  0.0387V | IQ: 0.9410  0.9749 | err: -0.0590  -0.0251 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0629V  0.0967V  0.0161V | IQ: 0.8299  0.0900 | err: -0.1701  0.0900 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0790V  0.0185V  0.0733V | IQ: -0.0800  1.0281 | err: -0.0800  1.0281 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.1177V  0.0532V  0.0395V | IQ: 0.8607  1.0539 | err: -0.1393  0.0539 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0621V  0.0935V  0.0161V | IQ: 0.9075  -0.0079 | err: 0.9075  -1.0079 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0822V  0.0395V | IQ: -0.0926  0.0085 | err: -0.0926  0.0085 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.1177V  0.0588V  0.0411V | IQ: 0.6405  1.2744 | err: -0.3595  1.2744 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0774V  0.0169V  0.0733V | IQ: -0.0441  0.9571 | err: -0.0441  -0.0429 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0201V  0.0806V  0.0395V | IQ: -0.0509  -0.0184 | err: -0.0509  -0.0184 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0612V  0.0959V  0.0153V | IQ: 0.8864  0.0023 | err: -0.1136  0.0023 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4142  Q=0.5079
+Calibrating...
+Calibration done
+dc:  0.0476  0.0646  0.0777
+rg:  11.8815  -3.8569  3.7336
+ig:  8.6072  10.3485  11.2750
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0806V  0.0387V | IQ: -0.0532  -0.0244 | err: -0.0532  -0.0244 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0741V  0.0758V  0.0943V | IQ: 0.8337  1.0311 | err: -0.1663  0.0311 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0210V  0.1048V  0.0935V | IQ: 0.0869  0.8645 | err: 0.0869  -0.1355 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0193V  0.0782V  0.0387V | IQ: -0.0343  -0.0424 | err: -0.0343  -0.0424 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0588V  0.0201V  0.0766V | IQ: 0.8001  0.1240 | err: -0.1999  0.1240 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0234V  0.1032V  0.0927V | IQ: 0.1188  0.8595 | err: 0.1188  -0.1405 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0725V  0.0733V  0.0951V | IQ: 0.8269  1.0013 | err: -0.1731  0.0013 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0580V  0.0201V  0.0766V | IQ: 0.7905  0.1171 | err: -0.2095  0.1171 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0234V  0.1023V  0.0911V | IQ: 0.1159  0.8330 | err: 0.1159  0.8330 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0741V  0.0733V  0.0943V | IQ: 0.8430  1.0061 | err: -0.1570  0.0061 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0580V  0.0161V  0.0766V | IQ: 0.8060  0.0754 | err: 0.8060  -0.9246 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0169V  0.0798V  0.0379V | IQ: -0.0723  -0.0557 | err: -0.0723  -0.0557 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0749V  0.0733V  0.0951V | IQ: 0.8556  1.0221 | err: -0.1444  1.0221 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0226V  0.1015V  0.0903V | IQ: 0.1064  0.8087 | err: 0.1064  -0.1913 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0185V  0.0790V  0.0379V | IQ: -0.0500  -0.0501 | err: -0.0500  -0.0501 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0580V  0.0185V  0.0774V | IQ: 0.7997  0.1095 | err: -0.2003  0.1095 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4234  Q=0.4800
+Calibrating...
+Calibration done
+dc:  0.0250  0.1093  0.0568
+rg:  -98.3551  45.3671  -3.2493
+ig:  113.4330  -14.1308  15.3740
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0782V  0.0411V | IQ: -0.2222  -0.0380 | err: -0.2222  -0.0380 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0306V  0.1225V  0.0588V | IQ: 0.5421  0.9794 | err: -0.4579  -0.0206 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0363V  0.1241V  0.0258V | IQ: 0.1677  1.0886 | err: 0.1677  0.0886 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0177V  0.0774V  0.0403V | IQ: -0.1769  -0.1304 | err: -0.1769  -0.1304 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.1080V  0.0886V | IQ: 1.2931  -0.0940 | err: 0.2931  -0.0940 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=0 | ADC: 0.0355V  0.1241V  0.0266V | IQ: 0.2444  1.0096 | err: 0.2444  0.0096 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0282V  0.1225V  0.0588V | IQ: 0.7799  0.7052 | err: -0.2201  -0.2948 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.1080V  0.0878V | IQ: 1.3750  -0.1978 | err: 0.3750  -0.1978 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0169V  0.0798V  0.0387V | IQ: 0.0173  -0.2807 | err: 0.0173  -0.2807 | err_bit(0=richtig,1=falsch): 0  0
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0306V  0.1241V  0.0588V | IQ: 0.6152  0.9567 | err: -0.3848  -0.0433 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0153V  0.1064V  0.0886V | IQ: 1.2200  -0.0712 | err: 1.2200  -1.0712 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0774V  0.0395V | IQ: -0.2535  -0.0514 | err: -0.2535  -0.0514 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0306V  0.1241V  0.0588V | IQ: 0.6152  0.9567 | err: -0.3848  0.9567 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0347V  0.1233V  0.0266V | IQ: 0.2871  0.9295 | err: 0.2871  -0.0705 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0185V  0.0766V  0.0387V | IQ: -0.2874  -0.0524 | err: -1.2874  -1.0524 | err_bit(0=richtig,1=falsch): 1  1
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0153V  0.1048V  0.0886V | IQ: 1.1468  -0.0484 | err: 0.1468  -0.0484 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4602  Q=0.3538
+Calibrating...
+Calibration done
+dc:  0.0577  0.0980  0.0247
+rg:  14.6138  47.8013  57.0170
+ig:  12.4789  -7.6292  -9.2292
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0790V  0.0403V | IQ: -0.0922  0.0129 | err: -0.0922  0.0129 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0959V  0.1080V  0.0145V | IQ: 0.9548  0.9949 | err: -0.0452  -0.0051 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0870V  0.0862V  0.0226V | IQ: 0.2447  0.9759 | err: 0.2447  -0.0241 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0185V  0.0806V  0.0403V | IQ: -0.0152  0.0006 | err: -0.0152  0.0006 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0290V  0.1201V  0.0226V | IQ: 1.0146  -0.0063 | err: 0.0146  -0.0063 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0870V  0.0838V  0.0226V | IQ: 0.1291  0.9944 | err: 0.1291  -0.0056 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0983V  0.1056V  0.0153V | IQ: 0.9205  1.0361 | err: -0.0795  0.0361 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0282V  0.1201V  0.0234V | IQ: 1.0488  -0.0238 | err: 0.0488  -0.0238 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0870V  0.0886V  0.0242V | IQ: 0.4521  0.9426 | err: 0.4521  0.9426 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0967V  0.1088V  0.0153V | IQ: 1.0510  0.9914 | err: 0.0510  -0.0086 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0290V  0.1193V  0.0234V | IQ: 1.0221  -0.0076 | err: 1.0221  -1.0076 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0782V  0.0403V | IQ: -0.1189  0.0291 | err: -0.1189  0.0291 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0967V  0.1088V  0.0153V | IQ: 1.0510  0.9914 | err: 0.0510  0.9914 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0862V  0.0854V  0.0234V | IQ: 0.2403  0.9646 | err: 0.2403  -0.0354 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0201V  0.0790V  0.0403V | IQ: -0.0686  0.0330 | err: -0.0686  0.0330 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0298V  0.1193V  0.0242V | IQ: 1.0798  -0.0050 | err: 0.0798  -0.0050 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.5571  Q=0.4953
+Calibrating...
+Calibration done
+dc:  0.0704  0.0519  0.0529
+rg:  5.9830  -15.3832  -23.1662
+ig:  10.9182  6.9775  18.6311
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.0790V  0.0387V | IQ: 0.1026  -0.1423 | err: 0.1026  -0.1423 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.1096V  0.0169V  0.0645V | IQ: 1.0046  0.8994 | err: 0.0046  -0.1006 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0645V  0.0355V  0.0895V | IQ: -0.1293  1.0015 | err: -0.1293  0.0015 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0185V  0.0806V  0.0403V | IQ: 0.0405  -0.1010 | err: 0.0405  -0.1010 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0693V  0.0733V  0.0274V | IQ: 0.7545  0.1624 | err: -0.2455  0.1624 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0637V  0.0274V  0.0903V | IQ: -0.0288  0.9514 | err: -0.0288  -0.0486 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.1112V  0.0177V  0.0637V | IQ: 1.0205  0.9076 | err: 0.0205  -0.0924 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0685V  0.0733V  0.0266V | IQ: 0.7683  0.1386 | err: -0.2317  0.1386 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0637V  0.0322V  0.0886V | IQ: -0.0659  0.9552 | err: -0.0659  0.9552 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.1120V  0.0153V  0.0653V | IQ: 1.0252  0.9296 | err: 0.0252  -0.0704 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0693V  0.0725V  0.0266V | IQ: 0.7855  0.1418 | err: 0.7855  -0.8582 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0782V  0.0387V | IQ: 0.1198  -0.1391 | err: 0.1198  -0.1391 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.1120V  0.0137V  0.0653V | IQ: 1.0499  0.9183 | err: 0.0499  0.9183 | err_bit(0=richtig,1=falsch): 0  1
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0653V  0.0306V  0.0903V | IQ: -0.0688  0.9915 | err: -0.0688  -0.0085 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0201V  0.0798V  0.0379V | IQ: 0.1185  -0.1341 | err: 0.1185  -0.1341 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0685V  0.0717V  0.0266V | IQ: 0.7931  0.1274 | err: -0.2069  0.1274 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4556  Q=0.4755
+Calibrating...
+Calibration done
+dc:  0.0348  0.0803  0.0785
+rg:  12.7503  -1.6827  9.5333
+ig:  13.3471  15.4064  6.8482
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0782V  0.0379V | IQ: -0.0804  -0.0174 | err: -0.0804  -0.0174 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0508V  0.0959V  0.0943V | IQ: 0.8283  1.0615 | err: -0.1717  0.0615 | err_bit(0=richtig,1=falsch): 0  0
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0169V  0.1168V  0.0766V | IQ: 0.1925  0.8111 | err: 0.1925  -0.1889 | err_bit(0=richtig,1=falsch): 0  0
+n=3 I_sym=0 Q_sym=1 | ADC: 0.0193V  0.0782V  0.0395V | IQ: -0.0650  -0.0064 | err: -0.0650  -0.0064 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0427V  0.0467V  0.0895V | IQ: 0.7622  0.1635 | err: -0.2378  0.1635 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=1 | ADC: 0.0177V  0.1168V  0.0749V | IQ: 0.1874  0.8109 | err: 0.1874  -0.1891 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0492V  0.0983V  0.0927V | IQ: 0.7883  1.0662 | err: -0.2117  0.0662 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0419V  0.0500V  0.0927V | IQ: 0.7772  0.2245 | err: -0.2228  0.2245 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0185V  0.1177V  0.0741V | IQ: 0.1886  0.8285 | err: 0.1886  0.8285 | err_bit(0=richtig,1=falsch): 0  1
+n=9 I_sym=1 Q_sym=1 | ADC: 0.0492V  0.0943V  0.0927V | IQ: 0.7951  1.0041 | err: -0.2049  0.0041 | err_bit(0=richtig,1=falsch): 0  0
+n=10 I_sym=0 Q_sym=1 | ADC: 0.0395V  0.0443V  0.0919V | IQ: 0.7482  0.0998 | err: 0.7482  -0.9002 | err_bit(0=richtig,1=falsch): 1  1
+n=11 I_sym=0 Q_sym=0 | ADC: 0.0201V  0.0790V  0.0387V | IQ: -0.0637  0.0113 | err: -0.0637  0.0113 | err_bit(0=richtig,1=falsch): 0  0
+n=12 I_sym=1 Q_sym=0 | ADC: 0.0500V  0.0959V  0.0935V | IQ: 0.8104  1.0452 | err: -0.1896  0.0452 | err_bit(0=richtig,1=falsch): 0  0
+n=13 I_sym=0 Q_sym=1 | ADC: 0.0177V  0.1168V  0.0741V | IQ: 0.1797  0.8053 | err: 0.1797  -0.1947 | err_bit(0=richtig,1=falsch): 0  0
+n=14 I_sym=1 Q_sym=1 | ADC: 0.0177V  0.0814V  0.0379V | IQ: -0.1063  0.0107 | err: -0.1063  0.0107 | err_bit(0=richtig,1=falsch): 0  0
+n=15 I_sym=1 Q_sym=0 | ADC: 0.0427V  0.0540V  0.0919V | IQ: 0.7730  0.2918 | err: -0.2270  0.2918 | err_bit(0=richtig,1=falsch): 0  0
+AVG I=0.4197  Q=0.5132
+Calibrating...
+Calibration done
+dc:  0.0332  0.1110  0.0432
+rg:  -123.9368  82.0931  -81.7391
+ig:  103.5824  -34.7355  62.9082
+--- burst ---
+n=0 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0790V  0.0403V | IQ: -0.1702  -0.0075 | err: -0.1702  -0.0075 | err_bit(0=richtig,1=falsch): 0  0
+n=1 I_sym=1 Q_sym=0 | ADC: 0.0467V  0.1241V  0.0347V | IQ: 0.5999  0.9081 | err: -0.4001  0.9081 | err_bit(0=richtig,1=falsch): 0  1
+n=2 I_sym=0 Q_sym=1 | ADC: 0.0564V  0.1185V  0.0153V | IQ: 0.5192  0.8891 | err: 0.5192  -0.1109 | err_bit(0=richtig,1=falsch): 1  0
+n=3 I_sym=1 Q_sym=1 | ADC: 0.0185V  0.0798V  0.0411V | IQ: -0.0700  -0.0683 | err: -0.0700  -0.0683 | err_bit(0=richtig,1=falsch): 0  0
+n=4 I_sym=1 Q_sym=0 | ADC: 0.0129V  0.1152V  0.0725V | IQ: 0.9710  0.0929 | err: -0.0290  0.0929 | err_bit(0=richtig,1=falsch): 0  0
+n=5 I_sym=0 Q_sym=0 | ADC: 0.0572V  0.1177V  0.0153V | IQ: 0.3531  1.0005 | err: 0.3531  0.0005 | err_bit(0=richtig,1=falsch): 0  0
+n=6 I_sym=1 Q_sym=1 | ADC: 0.0459V  0.1257V  0.0347V | IQ: 0.8321  0.7687 | err: -0.1679  -0.2313 | err_bit(0=richtig,1=falsch): 0  0
+n=7 I_sym=1 Q_sym=0 | ADC: 0.0145V  0.1160V  0.0709V | IQ: 0.9692  0.1304 | err: -0.0308  0.1304 | err_bit(0=richtig,1=falsch): 0  0
+n=8 I_sym=0 Q_sym=0 | ADC: 0.0193V  0.0774V  0.0419V | IQ: -0.4342  0.1498
