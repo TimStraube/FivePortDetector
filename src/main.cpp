@@ -31,6 +31,8 @@
 #include <Arduino.h>
 #include <math.h>
 #include <stdio.h>
+#include <SPI.h>
+#include "Screen_ST7735.h"
 
 // ───────── TM4C Low-Level ─────────
 extern "C" {
@@ -52,7 +54,11 @@ extern "C" {
 #define LAMBDA 0.1237f
 
 
-#define SERIAL_SHOW_ADC 1
+// Ausfuehrliches Pro-Sample-Print braucht bei 921600 Baud laenger als die
+// 1ms Symbolperiode - waehrenddessen laeuft der 1kHz-Timer weiter und der
+// Schleifenzaehler verliert die Synchronisation zu sym_idx (Symbole werden
+// uebersprungen). Deshalb per Default aus.
+#define SERIAL_SHOW_ADC 0
 #define SERIAL_SHOW_IQ  1
 
 #define FS 1000   // 1 kHz
@@ -75,6 +81,15 @@ volatile bool calibrate_request = false;
 static float rg1[3], ig1[3], dc1[3];
 static float rg2[3], ig2[3], dc2[3];
 static bool calibrated = false;
+
+// ───────── Display-Historie ─────────
+static float disp_errPct_I1 = 0, disp_errPct_Q1 = 0;
+static float disp_errPct_I2 = 0, disp_errPct_Q2 = 0;
+static float disp_doa = 0;
+
+// Board steckt in BoosterPack 2 (nicht 1!) - Pins CS=PP3, RST=PA7, DC=PK7
+// laut SPMU372A Table 2-2 (EK-TM4C129EXL-Handbuch).
+Screen_ST7735 myScreen(PA_7, PK_7, PP_3, NULL);
 
 // ───────── Training ─────────
 #define N_CAL 16
@@ -271,6 +286,148 @@ float compute_doa(float dphi)
     return asinf(x) * 180.0f / M_PI;
 }
 
+// ───────── Display Layout (feste Positionen fuer Teil-Updates) ─────────
+// Nur die Zahlenwerte werden neu gezeichnet, nicht der ganze Screen - das
+// vermeidet das "Aufblitzen" durch ein volles clear() pro Zyklus. Statisch
+// (einmal in draw_static_layout) sind nur Titel, Labels und die Achse fuer
+// die Winkelanzeige; alles andere wird pro Burst in update_display() neu
+// geschrieben (Monospace-Font ueberschreibt alte Ziffern vollstaendig, auch
+// wenn die neue Zahl kuerzer ist, solange die Breite gepolstert ist).
+#define ROW_TITLE      8
+#define ROW_FP1        20
+#define ROW_FP2        30
+#define ROW_ERR        42
+#define BAR_Y0         52
+#define BAR_Y1         57
+#define ROW_DOA_LABEL  66
+#define ROW_DOA_BIG    76
+#define DOA_SCALE      3   // Pixel-Skalierung (ix/iy) fuer die grosse DOA-Zahl
+
+#define ANGLE_BAR_X0     4
+#define ANGLE_BAR_X1     124
+#define ANGLE_LINE_Y     112
+#define ANGLE_MARKER_Y   106
+#define ANGLE_MARKER_R   3
+#define ANGLE_MIN       -90.0f
+#define ANGLE_MAX        90.0f
+
+#define STATUS_DOT_X (128 - 6)
+#define STATUS_DOT_Y 6
+#define STATUS_DOT_R 4
+
+#define X_LABEL 0
+#define X_FP    26
+
+static bool layoutReady = false;
+static float prevDoaMarkerX = -1;  // <0 = noch kein Marker gezeichnet
+
+static String padNum(float v, uint8_t decimals, uint8_t width)
+{
+    String s = String(v, decimals);
+    while (s.length() < width) s += ' ';
+    return s;
+}
+
+// Rechtsbuendig (Leerzeichen vorne) - fuer Werte, an die direkt ein Suffix
+// wie "%" angehaengt wird, damit das Suffix nicht mit umherspringt.
+static String padNumLeft(float v, uint8_t decimals, uint8_t width)
+{
+    String s = String(v, decimals);
+    while (s.length() < width) s = " " + s;
+    return s;
+}
+
+static void draw_status_dot(uint16_t colour)
+{
+    myScreen.setPenSolid(true);
+    myScreen.circle(STATUS_DOT_X, STATUS_DOT_Y, STATUS_DOT_R, colour);
+    myScreen.setPenSolid(false);
+}
+
+static uint16_t angle_to_x(float deg)
+{
+    return ANGLE_BAR_X0 + (uint16_t)((ANGLE_BAR_X1 - ANGLE_BAR_X0) * ((deg - ANGLE_MIN) / (ANGLE_MAX - ANGLE_MIN)));
+}
+
+// Statische Elemente: einmalig zeichnen (Titel, Labels, Winkel-Achse)
+static void draw_static_layout()
+{
+    myScreen.clear(blackColour);
+    myScreen.setFontSize(0);
+
+    myScreen.gText(X_LABEL, ROW_TITLE, "DOA Detector", whiteColour);
+    myScreen.gText(X_LABEL, ROW_DOA_LABEL, "DOA (Grad):", whiteColour);
+
+    // Winkel-Achse: Linie + Endmarken (-90/+90) + Mittelmarke (0 Grad)
+    myScreen.line(ANGLE_BAR_X0, ANGLE_LINE_Y, ANGLE_BAR_X1, ANGLE_LINE_Y, whiteColour);
+    uint16_t cx = angle_to_x(0);
+    myScreen.line(ANGLE_BAR_X0, ANGLE_LINE_Y - 3, ANGLE_BAR_X0, ANGLE_LINE_Y + 3, whiteColour);
+    myScreen.line(ANGLE_BAR_X1, ANGLE_LINE_Y - 3, ANGLE_BAR_X1, ANGLE_LINE_Y + 3, whiteColour);
+    myScreen.line(cx, ANGLE_LINE_Y - 3, cx, ANGLE_LINE_Y + 3, whiteColour);
+
+    draw_status_dot(redColour);
+    layoutReady = true;
+    prevDoaMarkerX = -1;
+}
+
+// Dynamische Werte: nur diese Felder werden pro Burst aktualisiert
+static void update_display()
+{
+    if (!layoutReady) draw_static_layout();
+
+    myScreen.setFontSize(0);
+
+    // Vor der ersten Kalibrierung sind dc1/dc2 nur Platzhalter (Nullen) -
+    // gelb zeigt "noch nicht belastbar", gruen nach calibrate() "gueltig".
+    uint16_t dataCol = calibrated ? greenColour : yellowColour;
+
+    myScreen.gText(X_LABEL, ROW_FP1, "FP1:", whiteColour);
+    myScreen.gText(X_FP, ROW_FP1,
+        padNum(dc1[0],2,4) + " " + padNum(dc1[1],2,4) + " " + padNum(dc1[2],2,4),
+        dataCol);
+
+    myScreen.gText(X_LABEL, ROW_FP2, "FP2:", whiteColour);
+    myScreen.gText(X_FP, ROW_FP2,
+        padNum(dc2[0],2,4) + " " + padNum(dc2[1],2,4) + " " + padNum(dc2[2],2,4),
+        dataCol);
+
+    // ── Fehlerrate pro Fiveport ──
+    float errAvg1 = (disp_errPct_I1 + disp_errPct_Q1) / 2.0f;
+    float errAvg2 = (disp_errPct_I2 + disp_errPct_Q2) / 2.0f;
+    float errAvg  = (errAvg1 + errAvg2) / 2.0f;
+    uint16_t errCol1 = (errAvg1 < 10.0f) ? greenColour : (errAvg1 < 50.0f) ? yellowColour : redColour;
+    uint16_t errCol2 = (errAvg2 < 10.0f) ? greenColour : (errAvg2 < 50.0f) ? yellowColour : redColour;
+
+    myScreen.gText(X_LABEL, ROW_ERR, "Err1:" + padNumLeft(errAvg1,0,3) + "% Err2:" + padNumLeft(errAvg2,0,3) + "%",
+        (errAvg1 <= errAvg2) ? errCol2 : errCol1);
+
+    myScreen.setPenSolid(true);
+    myScreen.rectangle(0, BAR_Y0, 127, BAR_Y1, blackColour);
+    uint16_t barFill = (uint16_t)(127 * (errAvg / 100.0f));
+    uint16_t barCol = (errAvg < 10.0f) ? greenColour : (errAvg < 50.0f) ? yellowColour : redColour;
+    if (barFill > 0) myScreen.rectangle(0, BAR_Y0, barFill, BAR_Y1, barCol);
+    myScreen.setPenSolid(false);
+    myScreen.rectangle(0, BAR_Y0, 127, BAR_Y1, whiteColour);
+
+    // ── Status-Punkt oben rechts: gruen = laeuft & Fehlerrate <10% ──
+    bool statusOk = calibrated && (errAvg < 10.0f);
+    draw_status_dot(statusOk ? greenColour : redColour);
+
+    // ── Grosse DOA-Zahl ──
+    myScreen.gText(10, ROW_DOA_BIG, padNum(disp_doa, 1, 6) + " ", whiteColour, blackColour, DOA_SCALE, DOA_SCALE);
+
+    // ── Winkel-Marker (erst alten loeschen, dann neuen zeichnen) ──
+    uint16_t mx = angle_to_x(disp_doa);
+    myScreen.setPenSolid(true);
+    if (prevDoaMarkerX >= 0) {
+        myScreen.rectangle((uint16_t)prevDoaMarkerX - ANGLE_MARKER_R - 1, ANGLE_MARKER_Y - ANGLE_MARKER_R - 1,
+                            (uint16_t)prevDoaMarkerX + ANGLE_MARKER_R + 1, ANGLE_MARKER_Y + ANGLE_MARKER_R + 1, blackColour);
+    }
+    myScreen.circle(mx, ANGLE_MARKER_Y, ANGLE_MARKER_R, cyanColour);
+    myScreen.setPenSolid(false);
+    prevDoaMarkerX = mx;
+}
+
 // ───────── Setup ─────────
 void setup()
 {
@@ -282,6 +439,22 @@ void setup()
         120000000);
 
     Serial.begin(921600);
+
+    // GPIO-Ports fuer SPI und Screen-Steuerpins aktivieren (BoosterPack 2!)
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOQ);  // PQ0=SCK, PQ2=MOSI, PQ3=MISO (SSI3, BoosterPack 2)
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOQ));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOP);  // PP3=CS
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOP));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);  // PA7=RST
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA));
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOK);  // PK7=D/C
+    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOK));
+
+    SPI.setModule(4);  // SSI3 auf PQ0/PQ2/PQ3 (BoosterPack 2, wo das EduBP MKII wirklich steckt)
+    myScreen.begin();
+    // Zeigt dc1/dc2 direkt als Platzhalter (0.00, gelb) an, noch vor der
+    // ersten calibrate() - sonst waere der gelbe Zustand nie sichtbar.
+    update_display();
 
     // GPIO
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOC);
@@ -353,9 +526,8 @@ void setup()
 // ───────── Loop ─────────
 void loop()
 {
-    
     TimerEnable(TIMER0_BASE, TIMER_A);
-    
+
     if(calibrate_request){
         TimerDisable(TIMER0_BASE, TIMER_A);
         calibrate_request = false;
@@ -365,22 +537,50 @@ void loop()
         TimerEnable(TIMER0_BASE, TIMER_A);
     }
 
-
     Serial.println("--- burst ---");
-    float I_avg = 0, Q_avg = 0;
-    while(!new_sample_ready);
-    new_sample_ready = false;
+    float I1_avg = 0, Q1_avg = 0, I2_avg = 0, Q2_avg = 0;
+    int err_count_I1 = 0, err_count_Q1 = 0, err_count_I2 = 0, err_count_Q2 = 0;
 
-    float v1[3];
-    float v2[3];
-    read_detectors(v1, v2);
-    float I1,Q1,I2,Q2;
-    demodulate(v1, rg1, ig1, dc1, &I1, &Q1);
-    demodulate(v2, rg2, ig2, dc2, &I2, &Q2);
+    for(int n = 0; n < N_CAL; n++){
+        while(!new_sample_ready);
+        new_sample_ready = false;
 
+        float v1[3], v2[3];
+        read_detectors(v1, v2);
+        float I1, Q1, I2, Q2;
+        demodulate(v1, rg1, ig1, dc1, &I1, &Q1);
+        demodulate(v2, rg2, ig2, dc2, &I2, &Q2);
+        I1_avg += I1; Q1_avg += Q1;
+        I2_avg += I2; Q2_avg += Q2;
 
-    float phi1 = compute_phase(I1,Q1);
-    float phi2 = compute_phase(I2,Q2);
+        uint8_t decided_I1 = (I1 > 0.5f) ? 1 : 0;
+        uint8_t decided_Q1 = (Q1 > 0.5f) ? 1 : 0;
+        uint8_t decided_I2 = (I2 > 0.5f) ? 1 : 0;
+        uint8_t decided_Q2 = (Q2 > 0.5f) ? 1 : 0;
+        err_count_I1 += (decided_I1 != I_sent);
+        err_count_Q1 += (decided_Q1 != Q_sent);
+        err_count_I2 += (decided_I2 != I_sent);
+        err_count_Q2 += (decided_Q2 != Q_sent);
+
+        if(SERIAL_SHOW_ADC){
+            Serial.print("n="); Serial.print(n);
+            Serial.print(" I_sym="); Serial.print(I_sent);
+            Serial.print(" Q_sym="); Serial.print(Q_sent);
+            Serial.print(" | FP1 IQ: "); Serial.print(I1,4); Serial.print("  "); Serial.print(Q1,4);
+            Serial.print(" | FP2 IQ: "); Serial.print(I2,4); Serial.print("  "); Serial.println(Q2,4);
+        }
+    }
+
+    I1_avg /= N_CAL; Q1_avg /= N_CAL;
+    I2_avg /= N_CAL; Q2_avg /= N_CAL;
+
+    disp_errPct_I1 = 100.0f * err_count_I1 / N_CAL;
+    disp_errPct_Q1 = 100.0f * err_count_Q1 / N_CAL;
+    disp_errPct_I2 = 100.0f * err_count_I2 / N_CAL;
+    disp_errPct_Q2 = 100.0f * err_count_Q2 / N_CAL;
+
+    float phi1 = compute_phase(I1_avg, Q1_avg);
+    float phi2 = compute_phase(I2_avg, Q2_avg);
 
     float dphi = phi1 - phi2;
 
@@ -388,15 +588,23 @@ void loop()
     if(dphi > M_PI) dphi -= 2*M_PI;
     if(dphi < -M_PI) dphi += 2*M_PI;
 
-    float doa = compute_doa(dphi);
+    disp_doa = compute_doa(dphi);
 
-    float y = dphi * 180 / M_PI;
-    Serial.println(y);
-    Serial.print(doa);
-
+    if(SERIAL_SHOW_IQ){
+        Serial.print("Fehlerrate FP1: I="); Serial.print(disp_errPct_I1,1);
+        Serial.print("%  Q="); Serial.print(disp_errPct_Q1,1); Serial.println("%");
+        Serial.print("Fehlerrate FP2: I="); Serial.print(disp_errPct_I2,1);
+        Serial.print("%  Q="); Serial.print(disp_errPct_Q2,1); Serial.println("%");
+        Serial.print("AVG FP1 I="); Serial.print(I1_avg,4); Serial.print("  Q="); Serial.println(Q1_avg,4);
+        Serial.print("AVG FP2 I="); Serial.print(I2_avg,4); Serial.print("  Q="); Serial.println(Q2_avg,4);
+        Serial.print("dphi(deg)="); Serial.print(dphi*180.0f/M_PI,2);
+        Serial.print("  DOA(deg)="); Serial.println(disp_doa,2);
+    }
 
     TimerDisable(TIMER0_BASE, TIMER_A);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5, 0);
 
-    delay(100);
+    update_display();
+
+    delay(1000);
 }
