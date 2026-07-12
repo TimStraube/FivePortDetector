@@ -50,8 +50,15 @@ extern "C" {
 #define ADC_MAXVAL 4095.0f
 
 
-#define D_ANT 0.01f //anpassen auf richtigen abstand
+#define D_ANT 0.05f //anpassen auf richtigen abstand in cm
 #define LAMBDA 0.1237f
+
+// dphi0 wird weiter berechnet/geloggt (siehe calibrate()), aber NICHT von der
+// Messung abgezogen, solange die Kalibrier-ADC-Spanne so klein ist (siehe
+// "Kalibrier-ADC-Spanne" im Serial-Log) - dphi0 ist dabei selbst nur Rauschen
+// und verzerrt dP/DOA zusaetzlich an der +-180Grad-Wickelgrenze. Auf 1 setzen,
+// sobald die Signalstaerke stimmt und dphi0 zwischen Kalibrierungen stabil ist.
+#define USE_BORESIGHT_CORRECTION 0
 
 
 // Ausfuehrliches Pro-Sample-Print braucht bei 921600 Baud laenger als die
@@ -81,34 +88,52 @@ volatile bool calibrate_request = false;
 static float rg1[3], ig1[3], dc1[3];
 static float rg2[3], ig2[3], dc2[3];
 static bool calibrated = false;
+static uint32_t lastCalibMillis = 0;
 
 // ───────── Display-Historie ─────────
 static float disp_errPct_I1 = 0, disp_errPct_Q1 = 0;
 static float disp_errPct_I2 = 0, disp_errPct_Q2 = 0;
+static float disp_phi1_deg = 0, disp_phi2_deg = 0, disp_dphi_deg = 0;
+static float disp_p1p2_deg = 0;  // geglaetteter P1-P2 Zeigermittelwert, VOR Boresight-Korrektur
 static float disp_doa = 0;
+
+// Zeiger-Mittelwert (cos/sin) fuer den gleitenden Mittelwert von P1-P2 ueber
+// mehrere Bursts - Start bei Winkel 0 (Zeiger (1,0)).
+static float pdiffAvgCos = 1.0f, pdiffAvgSin = 0.0f;
+
+// Referenz-Phasenversatz (Boresight): dphi, das calibrate() bei "identischem"
+// Signal auf beiden Fiveports gemessen hat - wird von jeder Messung
+// abgezogen, damit ein Pfad-/Kabellaengenunterschied zwischen FP1 und FP2
+// nicht als scheinbarer Winkel erscheint.
+static float dphi0 = 0;
+
+static void demodulate(const float v[3], float rg[3], float ig[3], float dc[3], float* I, float* Q);
+float compute_phase(float I, float Q);
 
 // Board steckt in BoosterPack 2 (nicht 1!) - Pins CS=PP3, RST=PA7, DC=PK7
 // laut SPMU372A Table 2-2 (EK-TM4C129EXL-Handbuch).
 Screen_ST7735 myScreen(PA_7, PK_7, PP_3, NULL);
 
 // ───────── Training ─────────
-#define N_CAL 16
+// Mehr Samples pro Kalibrierung/Burst = weniger Rauschen in der
+// Least-Squares-Loesung (Fehler faellt in etwa mit 1/sqrt(N_CAL)).
+// Bei FS=1000Hz dauert ein Burst/eine Kalibrierung N_CAL Millisekunden - bei
+// 1000 also ca. 1s pro Messzyklus (kein delay() mehr danach, siehe loop()).
+// RAM reicht dafuer locker (V1/A1/V2/A2/Ivec/Qvec zusammen ~56KB von 256KB).
+#define N_CAL 1000
 
-const uint8_t I_TRAIN[N_CAL] = {
-  1, 1, 0, 0,  1, 1, 0, 0,  1, 1, 0, 0,  1, 1, 0, 0
-};
-
-const uint8_t Q_TRAIN[N_CAL] = {
-  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0,  1, 0, 1, 0
-};
+// QPSK-Trainingsfolge mit Periode 4 (I: 1,1,0,0 / Q: 1,0,1,0), beliebig lang
+// wiederholt - als Formel statt Array, damit N_CAL frei waehlbar bleibt.
+static inline uint8_t I_TRAIN_AT(int n) { return ((n & 3) < 2) ? 1 : 0; }
+static inline uint8_t Q_TRAIN_AT(int n) { return ((n & 1) == 0) ? 1 : 0; }
 
 // ───────── Timer ISR ─────────
 void Timer0IntHandler(void)
 {
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 
-    I_sent = I_TRAIN[sym_idx];
-    Q_sent = Q_TRAIN[sym_idx];
+    I_sent = I_TRAIN_AT(sym_idx);
+    Q_sent = Q_TRAIN_AT(sym_idx);
 
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4, I_sent ? GPIO_PIN_4 : 0);
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_5, Q_sent ? GPIO_PIN_5 : 0);
@@ -221,6 +246,25 @@ static void calibrate()
         Qvec[n] = (float)Q_sent - 0.5f;
     }
 
+    // Diagnose: Streuung der rohen ADC-Werte je Kanal waehrend der
+    // Kalibrierung. Sehr kleine Spannen (Kanal kaum ausgesteuert/haengt fest)
+    // oder Werte nahe 0V/VREF (Saettigung) sind typische Ursachen fuer eine
+    // schlecht konditionierte Least-Squares-Loesung (riesige rg/ig danach).
+    Serial.println("Kalibrier-ADC-Spanne (min..max V) je Kanal:");
+    for(int k=0;k<3;k++){
+        float min1=V1[0][k], max1=V1[0][k], min2=V2[0][k], max2=V2[0][k];
+        for(int n=1;n<N_CAL;n++){
+            if(V1[n][k]<min1) min1=V1[n][k];
+            if(V1[n][k]>max1) max1=V1[n][k];
+            if(V2[n][k]<min2) min2=V2[n][k];
+            if(V2[n][k]>max2) max2=V2[n][k];
+        }
+        Serial.print("  FP1 K"); Serial.print(k); Serial.print(": ");
+        Serial.print(min1,3); Serial.print(".."); Serial.print(max1,3);
+        Serial.print("  FP2 K"); Serial.print(k); Serial.print(": ");
+        Serial.print(min2,3); Serial.print(".."); Serial.println(max2,3);
+    }
+
     // dc = Mittelwert der Detektoren
     for(int k=0;k<3;k++){
         dc1[k]=0;
@@ -247,6 +291,7 @@ static void calibrate()
     lstsq3(A2,Qvec,N_CAL,ig2);
 
     calibrated=true;
+    lastCalibMillis = millis();
     Serial.println("Calibration done");
     Serial.print("dc1:  "); Serial.print(dc1[0],4); Serial.print("  "); Serial.print(dc1[1],4); Serial.print("  "); Serial.println(dc1[2],4);
     Serial.print("rg1:  "); Serial.print(rg1[0],4); Serial.print("  "); Serial.print(rg1[1],4); Serial.print("  "); Serial.println(rg1[2],4);
@@ -254,6 +299,25 @@ static void calibrate()
     Serial.print("dc2:  "); Serial.print(dc2[0],4); Serial.print("  "); Serial.print(dc2[1],4); Serial.print("  "); Serial.println(dc2[2],4);
     Serial.print("rg2:  "); Serial.print(rg2[0],4); Serial.print("  "); Serial.print(rg2[1],4); Serial.print("  "); Serial.println(rg2[2],4);
     Serial.print("ig2:  "); Serial.print(ig2[0],4); Serial.print("  "); Serial.print(ig2[1],4); Serial.print("  "); Serial.println(ig2[2],4);
+
+    // Referenz-Phasenversatz: die gerade aufgenommenen Kalibrierdaten mit den
+    // frischen Koeffizienten demodulieren und dphi als Boresight-Nullpunkt
+    // merken. Setzt voraus, dass beim Kalibrieren beide Fiveports das
+    // gleiche Referenzsignal sehen (z.B. gleiche Quelle, symmetrisch verkabelt).
+    float I1sum=0, Q1sum=0, I2sum=0, Q2sum=0;
+    for(int n=0;n<N_CAL;n++){
+        float I1,Q1,I2,Q2;
+        demodulate(V1[n], rg1, ig1, dc1, &I1, &Q1);
+        demodulate(V2[n], rg2, ig2, dc2, &I2, &Q2);
+        I1sum+=I1; Q1sum+=Q1;
+        I2sum+=I2; Q2sum+=Q2;
+    }
+    float phi1_ref = compute_phase(I1sum/N_CAL, Q1sum/N_CAL);
+    float phi2_ref = compute_phase(I2sum/N_CAL, Q2sum/N_CAL);
+    dphi0 = phi1_ref - phi2_ref;
+    if(dphi0 > M_PI) dphi0 -= 2*M_PI;
+    if(dphi0 < -M_PI) dphi0 += 2*M_PI;
+    Serial.print("dphi0 (Boresight, Grad): "); Serial.println(dphi0 * 180.0f / M_PI, 2);
 }
 
 // ───────── Demod ─────────
@@ -294,46 +358,28 @@ float compute_doa(float dphi)
 // geschrieben (Monospace-Font ueberschreibt alte Ziffern vollstaendig, auch
 // wenn die neue Zahl kuerzer ist, solange die Breite gepolstert ist).
 #define ROW_TITLE      8
-#define ROW_FP1        20
-#define ROW_FP2        30
-#define ROW_ERR        42
-#define BAR_Y0         52
-#define BAR_Y1         57
-#define ROW_DOA_LABEL  66
-#define ROW_DOA_BIG    76
-#define DOA_SCALE      3   // Pixel-Skalierung (ix/iy) fuer die grosse DOA-Zahl
-
-#define ANGLE_BAR_X0     4
-#define ANGLE_BAR_X1     124
-#define ANGLE_LINE_Y     112
-#define ANGLE_MARKER_Y   106
-#define ANGLE_MARKER_R   3
-#define ANGLE_MIN       -90.0f
-#define ANGLE_MAX        90.0f
+#define ROW_PHASES     24
+#define X_PHASE2       64
+#define ROW_DPHI       36
+#define X_DPHI         0
+#define ROW_PDIFF_LABEL 46
+#define ROW_PDIFF_BIG  56
+#define DOA_SCALE      3   // Pixel-Skalierung (ix/iy) fuer die grosse P1-P2-Zahl
+#define ROW_BTN        92  // statischer Hinweis, welcher Taster kalibriert
+#define ROW_CAL_INFO   105 // dynamisch: wie lange die letzte Kalibrierung her ist
 
 #define STATUS_DOT_X (128 - 6)
 #define STATUS_DOT_Y 6
 #define STATUS_DOT_R 4
 
 #define X_LABEL 0
-#define X_FP    26
 
 static bool layoutReady = false;
-static float prevDoaMarkerX = -1;  // <0 = noch kein Marker gezeichnet
 
 static String padNum(float v, uint8_t decimals, uint8_t width)
 {
     String s = String(v, decimals);
     while (s.length() < width) s += ' ';
-    return s;
-}
-
-// Rechtsbuendig (Leerzeichen vorne) - fuer Werte, an die direkt ein Suffix
-// wie "%" angehaengt wird, damit das Suffix nicht mit umherspringt.
-static String padNumLeft(float v, uint8_t decimals, uint8_t width)
-{
-    String s = String(v, decimals);
-    while (s.length() < width) s = " " + s;
     return s;
 }
 
@@ -344,30 +390,21 @@ static void draw_status_dot(uint16_t colour)
     myScreen.setPenSolid(false);
 }
 
-static uint16_t angle_to_x(float deg)
-{
-    return ANGLE_BAR_X0 + (uint16_t)((ANGLE_BAR_X1 - ANGLE_BAR_X0) * ((deg - ANGLE_MIN) / (ANGLE_MAX - ANGLE_MIN)));
-}
-
-// Statische Elemente: einmalig zeichnen (Titel, Labels, Winkel-Achse)
+// Statische Elemente: einmalig zeichnen (Titel, Labels, Taster-Hinweis)
 static void draw_static_layout()
 {
     myScreen.clear(blackColour);
     myScreen.setFontSize(0);
 
     myScreen.gText(X_LABEL, ROW_TITLE, "DOA Detector", whiteColour);
-    myScreen.gText(X_LABEL, ROW_DOA_LABEL, "DOA (Grad):", whiteColour);
+    myScreen.gText(X_LABEL, ROW_PDIFF_LABEL, "P1 - P2 (mean):", whiteColour);
+    myScreen.gText(X_DPHI, ROW_DPHI, "dP:", whiteColour);
 
-    // Winkel-Achse: Linie + Endmarken (-90/+90) + Mittelmarke (0 Grad)
-    myScreen.line(ANGLE_BAR_X0, ANGLE_LINE_Y, ANGLE_BAR_X1, ANGLE_LINE_Y, whiteColour);
-    uint16_t cx = angle_to_x(0);
-    myScreen.line(ANGLE_BAR_X0, ANGLE_LINE_Y - 3, ANGLE_BAR_X0, ANGLE_LINE_Y + 3, whiteColour);
-    myScreen.line(ANGLE_BAR_X1, ANGLE_LINE_Y - 3, ANGLE_BAR_X1, ANGLE_LINE_Y + 3, whiteColour);
-    myScreen.line(cx, ANGLE_LINE_Y - 3, cx, ANGLE_LINE_Y + 3, whiteColour);
+    // Hinweis, welcher Taster die Kalibrierung ausloest (PJ0, aendert sich nie)
+    myScreen.gText(X_LABEL, ROW_BTN, "Kalibr.: Taste PJ0", whiteColour);
 
     draw_status_dot(redColour);
     layoutReady = true;
-    prevDoaMarkerX = -1;
 }
 
 // Dynamische Werte: nur diese Felder werden pro Burst aktualisiert
@@ -377,55 +414,31 @@ static void update_display()
 
     myScreen.setFontSize(0);
 
-    // Vor der ersten Kalibrierung sind dc1/dc2 nur Platzhalter (Nullen) -
-    // gelb zeigt "noch nicht belastbar", gruen nach calibrate() "gueltig".
-    uint16_t dataCol = calibrated ? greenColour : yellowColour;
-
-    myScreen.gText(X_LABEL, ROW_FP1, "FP1:", whiteColour);
-    myScreen.gText(X_FP, ROW_FP1,
-        padNum(dc1[0],2,4) + " " + padNum(dc1[1],2,4) + " " + padNum(dc1[2],2,4),
-        dataCol);
-
-    myScreen.gText(X_LABEL, ROW_FP2, "FP2:", whiteColour);
-    myScreen.gText(X_FP, ROW_FP2,
-        padNum(dc2[0],2,4) + " " + padNum(dc2[1],2,4) + " " + padNum(dc2[2],2,4),
-        dataCol);
-
-    // ── Fehlerrate pro Fiveport ──
+    // Fehlerrate wird nicht mehr angezeigt, fliesst aber weiter in den
+    // Status-Punkt und die Farbe der Phasendifferenz ein.
     float errAvg1 = (disp_errPct_I1 + disp_errPct_Q1) / 2.0f;
     float errAvg2 = (disp_errPct_I2 + disp_errPct_Q2) / 2.0f;
     float errAvg  = (errAvg1 + errAvg2) / 2.0f;
-    uint16_t errCol1 = (errAvg1 < 10.0f) ? greenColour : (errAvg1 < 50.0f) ? yellowColour : redColour;
-    uint16_t errCol2 = (errAvg2 < 10.0f) ? greenColour : (errAvg2 < 50.0f) ? yellowColour : redColour;
-
-    myScreen.gText(X_LABEL, ROW_ERR, "Err1:" + padNumLeft(errAvg1,0,3) + "% Err2:" + padNumLeft(errAvg2,0,3) + "%",
-        (errAvg1 <= errAvg2) ? errCol2 : errCol1);
-
-    myScreen.setPenSolid(true);
-    myScreen.rectangle(0, BAR_Y0, 127, BAR_Y1, blackColour);
-    uint16_t barFill = (uint16_t)(127 * (errAvg / 100.0f));
     uint16_t barCol = (errAvg < 10.0f) ? greenColour : (errAvg < 50.0f) ? yellowColour : redColour;
-    if (barFill > 0) myScreen.rectangle(0, BAR_Y0, barFill, BAR_Y1, barCol);
-    myScreen.setPenSolid(false);
-    myScreen.rectangle(0, BAR_Y0, 127, BAR_Y1, whiteColour);
 
     // ── Status-Punkt oben rechts: gruen = laeuft & Fehlerrate <10% ──
     bool statusOk = calibrated && (errAvg < 10.0f);
     draw_status_dot(statusOk ? greenColour : redColour);
 
-    // ── Grosse DOA-Zahl ──
-    myScreen.gText(10, ROW_DOA_BIG, padNum(disp_doa, 1, 6) + " ", whiteColour, blackColour, DOA_SCALE, DOA_SCALE);
+    // ── Phasen (einzeln) + boresight-korrigierte Differenz ──
+    myScreen.gText(X_LABEL, ROW_PHASES, "P1:" + padNum(disp_phi1_deg,0,4), whiteColour);
+    myScreen.gText(X_PHASE2, ROW_PHASES, "P2:" + padNum(disp_phi2_deg,0,4), whiteColour);
+    myScreen.gText(X_DPHI + 18, ROW_DPHI, padNum(disp_dphi_deg,0,4), barCol);
+    myScreen.gText(10, ROW_PDIFF_BIG, padNum(disp_p1p2_deg, 0, 4) + " ", whiteColour, blackColour, DOA_SCALE, DOA_SCALE);
 
-    // ── Winkel-Marker (erst alten loeschen, dann neuen zeichnen) ──
-    uint16_t mx = angle_to_x(disp_doa);
-    myScreen.setPenSolid(true);
-    if (prevDoaMarkerX >= 0) {
-        myScreen.rectangle((uint16_t)prevDoaMarkerX - ANGLE_MARKER_R - 1, ANGLE_MARKER_Y - ANGLE_MARKER_R - 1,
-                            (uint16_t)prevDoaMarkerX + ANGLE_MARKER_R + 1, ANGLE_MARKER_Y + ANGLE_MARKER_R + 1, blackColour);
+    // ── Wie lange die letzte Kalibrierung her ist ──
+    if (calibrated) {
+        uint32_t agoSec = (millis() - lastCalibMillis) / 1000;
+        uint16_t agoCol = (agoSec < 60) ? greenColour : (agoSec < 300) ? yellowColour : redColour;
+        myScreen.gText(X_LABEL, ROW_CAL_INFO, "Kal. vor: " + padNum((float)agoSec, 0, 5) + "s", agoCol);
+    } else {
+        myScreen.gText(X_LABEL, ROW_CAL_INFO, "Kal. vor: nie", redColour);
     }
-    myScreen.circle(mx, ANGLE_MARKER_Y, ANGLE_MARKER_R, cyanColour);
-    myScreen.setPenSolid(false);
-    prevDoaMarkerX = mx;
 }
 
 // ───────── Setup ─────────
@@ -529,12 +542,15 @@ void loop()
     TimerEnable(TIMER0_BASE, TIMER_A);
 
     if(calibrate_request){
-        TimerDisable(TIMER0_BASE, TIMER_A);
         calibrate_request = false;
+        // Timer kurz anhalten, nur um sym_idx race-frei auf 0 zu setzen -
+        // VOR calibrate() wieder aktivieren, sonst kommen nie ADC-Samples
+        // rein und calibrate()'s while(!new_sample_ready) haengt fuer immer.
+        TimerDisable(TIMER0_BASE, TIMER_A);
         sym_idx = 0;
+        TimerEnable(TIMER0_BASE, TIMER_A);
         Serial.print("Calibrating both FP...\n");
         calibrate();
-        TimerEnable(TIMER0_BASE, TIMER_A);
     }
 
     Serial.println("--- burst ---");
@@ -588,7 +604,31 @@ void loop()
     if(dphi > M_PI) dphi -= 2*M_PI;
     if(dphi < -M_PI) dphi += 2*M_PI;
 
-    disp_doa = compute_doa(dphi);
+    // Gleitender Mittelwert von P1-P2 ueber mehrere Bursts, als Mittelung des
+    // Zeigers (cos/sin) statt des Winkels direkt - sonst wuerde Mitteln nahe
+    // der +-180Grad-Wickelgrenze falsche Ergebnisse liefern (z.B. +179 und
+    // -179 gemittelt wäre 0 statt ~180). alpha=Anteil des neuen Bursts.
+    const float PDIFF_AVG_ALPHA = 0.5f;
+    pdiffAvgCos = (1.0f - PDIFF_AVG_ALPHA) * pdiffAvgCos + PDIFF_AVG_ALPHA * cosf(dphi);
+    pdiffAvgSin = (1.0f - PDIFF_AVG_ALPHA) * pdiffAvgSin + PDIFF_AVG_ALPHA * sinf(dphi);
+    float dphi_avg = atan2f(pdiffAvgSin, pdiffAvgCos);
+
+    // Boresight-Korrektur: Pfad-/Kabellaengenversatz zwischen FP1/FP2 abziehen,
+    // der bei calibrate() mit (vermutlich) identischem Signal gemessen wurde.
+    // Per USE_BORESIGHT_CORRECTION abschaltbar (siehe Kommentar oben bei D_ANT).
+#if USE_BORESIGHT_CORRECTION
+    float dphi_corr = dphi_avg - dphi0;
+    if(dphi_corr > M_PI) dphi_corr -= 2*M_PI;
+    if(dphi_corr < -M_PI) dphi_corr += 2*M_PI;
+#else
+    float dphi_corr = dphi_avg;
+#endif
+
+    disp_phi1_deg = phi1 * 180.0f / M_PI;
+    disp_phi2_deg = phi2 * 180.0f / M_PI;
+    disp_p1p2_deg = dphi_avg * 180.0f / M_PI;  // geglaettet, vor Boresight-Korrektur
+    disp_dphi_deg = dphi_corr * 180.0f / M_PI;
+    disp_doa = compute_doa(dphi_corr);
 
     if(SERIAL_SHOW_IQ){
         Serial.print("Fehlerrate FP1: I="); Serial.print(disp_errPct_I1,1);
@@ -597,7 +637,10 @@ void loop()
         Serial.print("%  Q="); Serial.print(disp_errPct_Q2,1); Serial.println("%");
         Serial.print("AVG FP1 I="); Serial.print(I1_avg,4); Serial.print("  Q="); Serial.println(Q1_avg,4);
         Serial.print("AVG FP2 I="); Serial.print(I2_avg,4); Serial.print("  Q="); Serial.println(Q2_avg,4);
-        Serial.print("dphi(deg)="); Serial.print(dphi*180.0f/M_PI,2);
+        Serial.print("dphi_raw(deg)="); Serial.print(dphi*180.0f/M_PI,2);
+        Serial.print("  dphi_avg(deg)="); Serial.print(dphi_avg*180.0f/M_PI,2);
+        Serial.print("  dphi0(deg)="); Serial.print(dphi0*180.0f/M_PI,2);
+        Serial.print("  dphi_korr(deg)="); Serial.print(disp_dphi_deg,2);
         Serial.print("  DOA(deg)="); Serial.println(disp_doa,2);
     }
 
@@ -605,6 +648,4 @@ void loop()
     GPIOPinWrite(GPIO_PORTC_BASE, GPIO_PIN_4 | GPIO_PIN_5, 0);
 
     update_display();
-
-    delay(1000);
 }

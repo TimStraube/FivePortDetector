@@ -115,7 +115,9 @@ void Screen_ST7735::begin()
     _writeCommand(ST7735_INVOFF);
 
     _writeCommand(ST7735_MADCTL);
-    _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB);
+    // BGR statt RGB: dieses Panel hat vertauschte Sub-Pixel, sonst
+    // erscheint z.B. redColour als Blau (klassisches ST7735-Klon-Problem).
+    _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR);
 
     _writeCommand(ST7735_COLMOD);
     _writeData(0x05);  // 16 bit/pixel
@@ -171,16 +173,16 @@ void Screen_ST7735::setOrientation(uint8_t orientation)
     _writeCommand(ST7735_MADCTL);
     switch (_orientation) {
         case 0:
-            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MY | ST7735_MADCTL_BGR);
             break;
         case 1:
-            _writeData(ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_MY | ST7735_MADCTL_MV | ST7735_MADCTL_BGR);
             break;
         case 2:
-            _writeData(ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_BGR);
             break;
         case 3:
-            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_RGB);
+            _writeData(ST7735_MADCTL_MX | ST7735_MADCTL_MV | ST7735_MADCTL_BGR);
             break;
     }
 }
