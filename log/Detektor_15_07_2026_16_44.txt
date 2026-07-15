@@ -1,0 +1,185 @@
+Calibration done
+dc:  0.2146  0.1015  0.0915
+rg:  9.7267  0.7677  -8.1506
+ig:  5.3338  11.4729  18.2588
+Calibrating...
+Calibration done
+dc:  0.2157  0.1094  0.0834
+rg:  8.8402  1.1100  -8.2735
+ig:  7.5273  -8.0977  -3.1702
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5812  Q=0.4530
+Calibrating...
+Calibration done
+dc:  0.1150  0.1526  0.1419
+rg:  -37.0262  -33.3804  2.9623
+ig:  -19.1880  -5.5238  -1.8580
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5920  Q=0.4494
+Calibrating...
+Calibration done
+dc:  0.2023  0.1546  0.0469
+rg:  1.0090  9.4875  -1.5709
+ig:  10.6851  -3.8965  -6.3022
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5252  Q=0.4439
+Calibrating...
+Calibration done
+dc:  0.1518  0.1147  0.1548
+rg:  15.2462  4.6350  6.3013
+ig:  10.5145  16.2994  6.5049
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5711  Q=0.4294
+Calibrating...
+Calibration done
+dc:  0.1610  0.1830  0.0520
+rg:  -19.6615  3.1749  -13.6391
+ig:  -3.9914  2.5713  -15.9916
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.6040  Q=0.4645
+Calibrating...
+Calibration done
+dc:  0.1934  0.0854  0.1343
+rg:  15.4037  3.8304  -1.3121
+ig:  -5.7816  -9.4078  7.6654
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.6046  Q=0.4158
+Calibrating...
+Calibration done
+dc:  0.1205  0.1820  0.0940
+rg:  -8.9545  0.1074  4.3289
+ig:  -10.8277  3.7910  -10.0629
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5824  Q=0.4601
+Calibrating...
+Calibration done
+dc:  0.2152  0.1030  0.0908
+rg:  9.7851  -0.5280  -9.4781
+ig:  5.8764  7.5599  14.0403
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5906  Q=0.4354
+Calibrating...
+Calibration done
+dc:  0.1126  0.1556  0.1376
+rg:  -31.8002  -26.3225  2.3251
+ig:  -8.5167  3.6096  -0.9831
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5334  Q=0.4503
+Calibrating...
+Calibration done
+dc:  0.2062  0.1519  0.0500
+rg:  2.0880  5.5937  -6.8470
+ig:  10.9228  -5.5280  -6.5249
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5339  Q=0.4499
+Calibrating...
+Calibration done
+dc:  0.1447  0.1220  0.1553
+rg:  -4.7196  -12.7884  6.5935
+ig:  -32.0428  -21.3605  4.3122
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=18.7%
+AVG I=0.5715  Q=0.4310
+Calibrating...
+Calibration done
+dc:  0.1693  0.1797  0.0478
+rg:  -15.7605  4.5757  -14.1548
+ig:  2.2215  2.7645  -11.6873
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5895  Q=0.4470
+Calibrating...
+Calibration done
+dc:  0.1876  0.0876  0.1395
+rg:  15.3852  4.1688  0.5284
+ig:  -7.6098  -11.8648  6.8448
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5863  Q=0.4380
+Calibrating...
+Calibration done
+dc:  0.1264  0.1837  0.0863
+rg:  -10.2974  0.9736  2.7479
+ig:  -12.7853  2.9752  -12.3233
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5862  Q=0.4821
+Calibrating...
+Calibration done
+dc:  0.2129  0.0973  0.0988
+rg:  10.8029  -3.7547  -11.5421
+ig:  4.7662  10.1279  16.1968
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5900  Q=0.4363
+Calibrating...
+Calibration done
+dc:  0.2099  0.0944  0.1093
+rg:  11.4973  0.6942  -6.8688
+ig:  4.7482  2.6842  9.5523
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.6213  Q=0.4163
+Calibrating...
+Calibration done
+dc:  0.1975  0.1573  0.0448
+rg:  0.4283  9.9011  -0.9723
+ig:  10.2910  -1.4299  -4.7683
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5540  Q=0.4127
+Calibrating...
+Calibration done
+dc:  0.1282  0.1844  0.0833
+rg:  -10.8783  1.2958  1.9990
+ig:  -12.8580  2.8688  -12.9454
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.6076  Q=0.4500
+Calibrating...
+Calibration done
+dc:  0.1238  0.1392  0.1500
+rg:  -9.1997  -14.5066  7.4539
+ig:  -21.4741  -9.8913  0.6619
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.5735  Q=0.4055
+Calibrating...
+Calibration done
+dc:  0.1930  0.0862  0.1349
+rg:  15.5271  4.0615  -1.0929
+ig:  -6.0104  -9.8718  7.5852
+--- burst ---
+err_bit: 0=richtig, 1=falsch erkannt
+Fehlerrate Burst: I=0.0%  Q=0.0%
+AVG I=0.6263  Q=0.3891
+Calibrating...
