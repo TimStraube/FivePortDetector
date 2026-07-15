@@ -3,6 +3,7 @@
 PlatformIO based firmware for testing and calibrating a Five-Port Detector using IQ bit sequences. The five-port ring is used as a phase/DOA (direction-of-arrival) receiver at 2.45 GHz; the firmware handles in-system calibration, demodulation and angle computation.
 
 ![Manufactured PCB](docs/img/Manufactured%20PCB.jpeg)
+![PCB Layout](docs/img/PCB.png)
 
 ## Branches
 
